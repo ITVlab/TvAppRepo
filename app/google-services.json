@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "29919293682",
+    "firebase_url": "https://tv-app-repo.firebaseio.com",
+    "project_id": "tv-app-repo",
+    "storage_bucket": "tv-app-repo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:29919293682:android:c87c1e28f04cf198",
+        "android_client_info": {
+          "package_name": "news.androidtv.tvapprepo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "29919293682-i98fgkksp6mglojvhp02k15c6mnnu4pm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5DSwYZY4bK7NonFNuJEvwjzNNCFotgMM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
