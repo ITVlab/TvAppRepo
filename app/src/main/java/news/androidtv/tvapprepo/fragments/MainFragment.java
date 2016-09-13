@@ -58,6 +58,7 @@ import news.androidtv.tvapprepo.activities.BrowseErrorActivity;
 import news.androidtv.tvapprepo.activities.DetailsActivity;
 import news.androidtv.tvapprepo.model.Apk;
 import news.androidtv.tvapprepo.model.RepoDatabase;
+import news.androidtv.tvapprepo.presenters.ApkPresenter;
 import news.androidtv.tvapprepo.presenters.CardPresenter;
 
 public class MainFragment extends BrowseFragment {
@@ -85,8 +86,6 @@ public class MainFragment extends BrowseFragment {
         setupUIElements();
         loadRows();
         setupEventListeners();
-        // Preload the database
-        RepoDatabase repoDatabase = RepoDatabase.getInstance(RepoDatabase.DATABASE_TYPE_TESTING);
     }
 
     @Override
@@ -100,8 +99,9 @@ public class MainFragment extends BrowseFragment {
 
     private void loadRows() {
         mRowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
-        CardPresenter cardPresenter = new CardPresenter();
+        ApkPresenter cardPresenter = new ApkPresenter();
         final ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
+        listRowAdapter.addAll(0, RepoDatabase.getInstance(RepoDatabase.DATABASE_TYPE_TESTING).getAppList());
         RepoDatabase.getInstance(RepoDatabase.DATABASE_TYPE_TESTING).addListener(new RepoDatabase.Listener() {
             @Override
             public void onApkAdded(Apk apk, int index) {
@@ -182,11 +182,11 @@ public class MainFragment extends BrowseFragment {
         public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
                                   RowPresenter.ViewHolder rowViewHolder, Row row) {
 
-            if (item instanceof Movie) {
-                Movie movie = (Movie) item;
+            if (item instanceof Apk) {
+                Apk application = (Apk) item;
                 Log.d(TAG, "Item: " + item.toString());
                 Intent intent = new Intent(getActivity(), DetailsActivity.class);
-                intent.putExtra(DetailsActivity.MOVIE, movie);
+                intent.putExtra(DetailsActivity.MOVIE, application.toString());
 
                 Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
                         getActivity(),
@@ -201,16 +201,14 @@ public class MainFragment extends BrowseFragment {
         @Override
         public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item,
                                    RowPresenter.ViewHolder rowViewHolder, Row row) {
-            if (item instanceof Movie) {
-                mBackgroundURI = ((Movie) item).getBackgroundImageURI();
+            if (item instanceof Apk) {
+                mBackgroundURI = URI.create(((Apk) item).getBanner());
                 startBackgroundTimer();
             }
-
         }
     }
 
     private class UpdateBackgroundTask extends TimerTask {
-
         @Override
         public void run() {
             mHandler.post(new Runnable() {
@@ -221,31 +219,6 @@ public class MainFragment extends BrowseFragment {
                     }
                 }
             });
-
         }
     }
-
-    private class GridItemPresenter extends Presenter {
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent) {
-            TextView view = new TextView(parent.getContext());
-            view.setLayoutParams(new ViewGroup.LayoutParams(GRID_ITEM_WIDTH, GRID_ITEM_HEIGHT));
-            view.setFocusable(true);
-            view.setFocusableInTouchMode(true);
-            view.setBackgroundColor(getResources().getColor(R.color.default_background));
-            view.setTextColor(Color.WHITE);
-            view.setGravity(Gravity.CENTER);
-            return new ViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder viewHolder, Object item) {
-            ((TextView) viewHolder.view).setText((String) item);
-        }
-
-        @Override
-        public void onUnbindViewHolder(ViewHolder viewHolder) {
-        }
-    }
-
 }

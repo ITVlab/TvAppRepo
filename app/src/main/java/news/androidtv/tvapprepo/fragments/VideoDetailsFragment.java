@@ -173,7 +173,7 @@ public class VideoDetailsFragment extends DetailsFragment {
     private void setupDetailsOverviewRowPresenter() {
         // Set detail background and style.
         DetailsOverviewRowPresenter detailsPresenter =
-                new DetailsOverviewRowPresenter(new DetailsDescriptionPresenter());
+                new DetailsOverviewRowPresenter(new DetailsDescriptionPresenter(getActivity()));
         detailsPresenter.setBackgroundColor(getResources().getColor(R.color.selected_background));
         detailsPresenter.setStyleLarge(true);
 
@@ -213,6 +213,23 @@ public class VideoDetailsFragment extends DetailsFragment {
     private void setupMovieListRowPresenter() {
         mPresenterSelector.addClassPresenter(ListRow.class, new ListRowPresenter());
     }
+
+/*    private void downloadApk() {
+        if (mApplication != null) {
+            String apkUrl = mApplication.getDownloadUrl();
+            if (mApplication.getLeanbackShortcut() != null) {
+                apkUrl += " " + mApplication.getLeanbackShortcut();
+            }
+            Intent downloadIntent;
+            // TODO Create and start download service
+            // TODO Initiate advertisement
+            // TODO Implement broadcast receiver to return to this fragment.
+        }
+    }
+
+    private void showDetails() {
+        Toast.makeText(mContext, "TODO", Toast.LENGTH_SHORT).show();
+    }*/
 
     private final class ItemViewClickedListener implements OnItemViewClickedListener {
         @Override

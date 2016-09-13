@@ -60,4 +60,19 @@ public class Apk {
     public String getVersionName() {
         return versionName;
     }
+
+    public static class Builder {
+
+        public Builder() {
+
+        }
+
+        public Builder(String serial) {
+
+        }
+
+        public Apk build() {
+            return null;
+        }
+    }
 }

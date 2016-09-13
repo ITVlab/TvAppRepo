@@ -24,14 +24,16 @@ import com.bumptech.glide.Glide;
 
 import news.androidtv.tvapprepo.Movie;
 import news.androidtv.tvapprepo.R;
+import news.androidtv.tvapprepo.model.Apk;
 
 /*
- * A CardPresenter is used to generate Views and bind Objects to them on demand.
- * It contains an Image CardView
+ * A presenter class to display metadata for an {@link Apk}.
+ *
+ * @author Nick Felker
+ * @version 2016.09.13
  */
-@Deprecated
-public class CardPresenter extends Presenter {
-    private static final String TAG = "CardPresenter";
+public class ApkPresenter extends Presenter {
+    private static final String TAG = ApkPresenter.class.getSimpleName();
 
     private static final int CARD_WIDTH = 313;
     private static final int CARD_HEIGHT = 176;
@@ -70,17 +72,17 @@ public class CardPresenter extends Presenter {
     }
 
     @Override
-    public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object item) {
-        Movie movie = (Movie) item;
+    public void onBindViewHolder(ViewHolder viewHolder, Object item) {
+        Apk application = (Apk) item;
         ImageCardView cardView = (ImageCardView) viewHolder.view;
 
         Log.d(TAG, "onBindViewHolder");
-        if (movie.getCardImageUrl() != null) {
-            cardView.setTitleText(movie.getTitle());
-            cardView.setContentText(movie.getStudio());
+        if (application.getBanner() != null) {
+            cardView.setTitleText(application.getName());
+            cardView.setContentText(application.getVersionName() + "\n" + application.isLeanback());
             cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT);
             Glide.with(viewHolder.view.getContext())
-                    .load(movie.getCardImageUrl())
+                    .load(application.getBanner())
                     .centerCrop()
                     .error(mDefaultCardImage)
                     .into(cardView.getMainImageView());
@@ -88,7 +90,7 @@ public class CardPresenter extends Presenter {
     }
 
     @Override
-    public void onUnbindViewHolder(Presenter.ViewHolder viewHolder) {
+    public void onUnbindViewHolder(ViewHolder viewHolder) {
         Log.d(TAG, "onUnbindViewHolder");
         ImageCardView cardView = (ImageCardView) viewHolder.view;
         // Remove references to images so that the garbage collector can free up memory

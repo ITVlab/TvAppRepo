@@ -14,20 +14,33 @@
 
 package news.androidtv.tvapprepo.presenters;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.v17.leanback.widget.AbstractDetailsDescriptionPresenter;
+import android.widget.Toast;
 
-import news.androidtv.tvapprepo.Movie;
+import news.androidtv.tvapprepo.model.Apk;
 
+/**
+ * This presenter provides a detailed
+ */
 public class DetailsDescriptionPresenter extends AbstractDetailsDescriptionPresenter {
+    private Apk mApplication;
+    private Context mContext;
+
+    public DetailsDescriptionPresenter(Context context) {
+        mContext = context;
+    }
 
     @Override
     protected void onBindDescription(ViewHolder viewHolder, Object item) {
-        Movie movie = (Movie) item;
+        mApplication = new Apk.Builder(((String) item)).build();
 
-        if (movie != null) {
-            viewHolder.getTitle().setText(movie.getTitle());
-            viewHolder.getSubtitle().setText(movie.getStudio());
-            viewHolder.getBody().setText(movie.getDescription());
+        if (mApplication != null) {
+            viewHolder.getTitle().setText(mApplication.getName());
+            viewHolder.getSubtitle().setText(mApplication.getVersionName() + "\n" +
+                    mApplication.isLeanback());
+            viewHolder.getBody().setText(mApplication.toString());
         }
     }
 }

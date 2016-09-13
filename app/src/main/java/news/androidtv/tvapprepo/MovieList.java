@@ -3,6 +3,7 @@ package news.androidtv.tvapprepo;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public final class MovieList {
     public static final String MOVIE_CATEGORY[] = {
             "Category Zero",
