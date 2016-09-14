@@ -22,7 +22,6 @@ import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
 
-import news.androidtv.tvapprepo.Movie;
 import news.androidtv.tvapprepo.R;
 import news.androidtv.tvapprepo.model.Apk;
 

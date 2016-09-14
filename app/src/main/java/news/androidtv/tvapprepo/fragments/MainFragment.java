@@ -15,13 +15,10 @@
 package news.androidtv.tvapprepo.fragments;
 
 import java.net.URI;
-import java.util.Collections;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -40,10 +37,7 @@ import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -51,15 +45,10 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
-import news.androidtv.tvapprepo.Movie;
-import news.androidtv.tvapprepo.MovieList;
 import news.androidtv.tvapprepo.R;
-import news.androidtv.tvapprepo.activities.BrowseErrorActivity;
 import news.androidtv.tvapprepo.activities.DetailsActivity;
-import news.androidtv.tvapprepo.model.Apk;
 import news.androidtv.tvapprepo.model.RepoDatabase;
 import news.androidtv.tvapprepo.presenters.ApkPresenter;
-import news.androidtv.tvapprepo.presenters.CardPresenter;
 
 public class MainFragment extends BrowseFragment {
     private static final String TAG = "MainFragment";
@@ -186,7 +175,7 @@ public class MainFragment extends BrowseFragment {
                 Apk application = (Apk) item;
                 Log.d(TAG, "Item: " + item.toString());
                 Intent intent = new Intent(getActivity(), DetailsActivity.class);
-                intent.putExtra(DetailsActivity.MOVIE, application.toString());
+                intent.putExtra(DetailsActivity.APPLICATION, application.toString());
 
                 Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
                         getActivity(),
