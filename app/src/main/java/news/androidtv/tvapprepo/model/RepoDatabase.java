@@ -10,6 +10,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -31,6 +32,10 @@ public class RepoDatabase {
     private static HashMap<String, Apk> apps;
     private static List<Listener> listenerList;
 
+    private RepoDatabase() {
+        listenerList = new ArrayList<>();
+    }
+
     public static RepoDatabase getInstance() {
         return getInstance(DATABASE_TYPE_TESTING);
     }
@@ -43,22 +48,24 @@ public class RepoDatabase {
         if (apps == null) {
             apps = new HashMap<>();
         }
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference(type);
         myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
-                Apk value = dataSnapshot.getValue(Apk.class);
-                Log.d(TAG, "Value is: " + value);
-                if (apps.containsKey(value.getPackageName()) &&
-                        apps.get(value.getPackageName()).getVersionCode() < value.getVersionCode() ||
-                        !apps.containsKey(value.getPackageName())) {
-                    for (Listener listener : listenerList) {
-                        listener.onApkAdded(value, apps.size());
+                for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                    Apk value = dataSnapshot1.getValue(Apk.class);
+                    Log.d(TAG, "Value is: " + value);
+                    if (apps.containsKey(value.getPackageName()) &&
+                            apps.get(value.getPackageName()).getVersionCode() < value.getVersionCode() ||
+                            !apps.containsKey(value.getPackageName())) {
+                        for (Listener listener : listenerList) {
+                            listener.onApkAdded(value, apps.size());
+                        }
+                        apps.put(value.getPackageName(), value);
                     }
-                    apps.put(value.getPackageName(), value);
                 }
             }
 
@@ -77,9 +84,6 @@ public class RepoDatabase {
 
     public void removeListener(Listener listener) {
         listenerList.remove(listener);
-    }
-
-    private RepoDatabase() {
     }
 
     public int getAppCount() {

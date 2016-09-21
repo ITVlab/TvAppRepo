@@ -47,6 +47,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 
 import news.androidtv.tvapprepo.R;
 import news.androidtv.tvapprepo.activities.DetailsActivity;
+import news.androidtv.tvapprepo.model.Apk;
 import news.androidtv.tvapprepo.model.RepoDatabase;
 import news.androidtv.tvapprepo.presenters.ApkPresenter;
 
