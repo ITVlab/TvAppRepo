@@ -37,4 +37,9 @@
     <string name="error_fragment_message">An error occurred</string>
     <string name="dismiss_error">Dismiss</string>
     <string name="oops">Oops</string>
+    <string name="update">Update</string>
+    <string name="uninstall">Uninstall</string>
+    <string name="install">Install</string>
+    <string name="app_not_leanback">This app is not optimized for TVs.</string>
+    <string name="app_leanback">Leanback app</string>
 </resources>

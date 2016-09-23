@@ -15,6 +15,9 @@
 package news.androidtv.tvapprepo.fragments;
 
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v17.leanback.app.BackgroundManager;
@@ -32,6 +35,7 @@ import android.support.v17.leanback.widget.OnItemViewClickedListener;
 import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
+import android.support.v17.leanback.widget.SparseArrayObjectAdapter;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -59,6 +63,9 @@ public class VideoDetailsFragment extends DetailsFragment {
     private static final int ACTION_WATCH_TRAILER = 1;
     private static final int ACTION_RENT = 2;
     private static final int ACTION_BUY = 3;
+    private static final int ACTION_INSTALL = 11;
+    private static final int ACTION_UPDATE = 12;
+    private static final int ACTION_UNINSTALL = 13;
 
     private static final int DETAIL_THUMB_WIDTH = 274;
     private static final int DETAIL_THUMB_HEIGHT = 274;
@@ -78,7 +85,6 @@ public class VideoDetailsFragment extends DetailsFragment {
         super.onCreate(savedInstanceState);
 
         prepareBackgroundManager();
-
         mSelectedApk = new Apk.Builder(getActivity().getIntent()
                 .getStringExtra(DetailsActivity.APPLICATION)).build();
         if (mSelectedApk != null) {
@@ -92,6 +98,7 @@ public class VideoDetailsFragment extends DetailsFragment {
         } else {
             Intent intent = new Intent(getActivity(), MainActivity.class);
             startActivity(intent);
+            Toast.makeText(getActivity(), "No app selected", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -151,12 +158,25 @@ public class VideoDetailsFragment extends DetailsFragment {
                     }
                 });
 
-        row.addAction(new Action(ACTION_WATCH_TRAILER, getResources().getString(
-                R.string.watch_trailer_1), getResources().getString(R.string.watch_trailer_2)));
-        row.addAction(new Action(ACTION_RENT, getResources().getString(R.string.rent_1),
-                getResources().getString(R.string.rent_2)));
-        row.addAction(new Action(ACTION_BUY, getResources().getString(R.string.buy_1),
-                getResources().getString(R.string.buy_2)));
+        // See if this is already installed. If so, check if it can be updated.
+        // Offer an uninstall option.
+        // Add an install button.
+        SparseArrayObjectAdapter possibleActions = new SparseArrayObjectAdapter();
+        PackageManager packageManager = getActivity().getPackageManager();
+        try {
+            PackageInfo info = packageManager.getPackageInfo(mSelectedApk.getPackageName(), 0);
+            if (info.versionCode < mSelectedApk.getVersionCode()) {
+                possibleActions.set(ACTION_UPDATE,
+                        new Action(ACTION_UPDATE, getString(R.string.update)));
+            }
+            possibleActions.set(ACTION_UNINSTALL,
+                    new Action(ACTION_UNINSTALL, getString(R.string.uninstall)));
+        } catch (PackageManager.NameNotFoundException e) {
+            // App is not installed
+            possibleActions.set(ACTION_UNINSTALL,
+                    new Action(ACTION_UNINSTALL, getString(R.string.install)));
+        }
+        row.setActionsAdapter(possibleActions);
 
         mAdapter.add(row);
     }
@@ -171,17 +191,6 @@ public class VideoDetailsFragment extends DetailsFragment {
         // Hook up transition element.
         detailsPresenter.setSharedElementEnterTransition(getActivity(),
                 DetailsActivity.SHARED_ELEMENT_NAME);
-
-        detailsPresenter.setOnActionClickedListener(new OnActionClickedListener() {
-            @Override
-            public void onActionClicked(Action action) {
-                if (action.getId() == ACTION_WATCH_TRAILER) {
-                    // TODO WATCH TRAILER
-                } else {
-                    Toast.makeText(getActivity(), action.toString(), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
         mPresenterSelector.addClassPresenter(DetailsOverviewRow.class, detailsPresenter);
     }
 
@@ -215,8 +224,8 @@ public class VideoDetailsFragment extends DetailsFragment {
         public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
                                   RowPresenter.ViewHolder rowViewHolder, Row row) {
 
-            if (item instanceof news.androidtv.tvapprepo.model.Apk) {
-                news.androidtv.tvapprepo.model.Apk application = (news.androidtv.tvapprepo.model.Apk) item;
+            if (item instanceof Apk) {
+                Apk application = (Apk) item;
                 Log.d(TAG, "Item: " + item.toString());
                 Intent intent = new Intent(getActivity(), DetailsActivity.class);
                 intent.putExtra(getResources().getString(R.string.movie), mSelectedApk.toString());
@@ -229,6 +238,15 @@ public class VideoDetailsFragment extends DetailsFragment {
                         ((ImageCardView) itemViewHolder.view).getMainImageView(),
                         DetailsActivity.SHARED_ELEMENT_NAME).toBundle();
                 getActivity().startActivity(intent, bundle);
+            } else if (item instanceof Action) {
+                Log.d(TAG, "Item: " + item.toString());
+                Action action = (Action) item;
+                if (action.getId() == ACTION_INSTALL ||
+                        action.getId() == ACTION_UPDATE) {
+                    // TODO Start installer
+                } else if (action.getId() == ACTION_UNINSTALL) {
+                    // TODO Uninstall
+                }
             }
         }
     }

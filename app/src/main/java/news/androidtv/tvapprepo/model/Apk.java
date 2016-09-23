@@ -110,7 +110,7 @@ public class Apk {
         }
 
         public Apk build() {
-            return null;
+            return mApk;
         }
     }
 }

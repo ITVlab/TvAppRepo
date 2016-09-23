@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.support.v17.leanback.widget.AbstractDetailsDescriptionPresenter;
 import android.widget.Toast;
 
+import news.androidtv.tvapprepo.R;
 import news.androidtv.tvapprepo.model.Apk;
 
 /**
@@ -34,13 +35,17 @@ public class DetailsDescriptionPresenter extends AbstractDetailsDescriptionPrese
 
     @Override
     protected void onBindDescription(ViewHolder viewHolder, Object item) {
-        mApplication = new Apk.Builder(((String) item)).build();
+        mApplication = (Apk) item;
 
         if (mApplication != null) {
             viewHolder.getTitle().setText(mApplication.getName());
-            viewHolder.getSubtitle().setText(mApplication.getVersionName() + "\n" +
-                    mApplication.isLeanback());
-            viewHolder.getBody().setText(mApplication.toString());
+            viewHolder.getSubtitle().setText(mApplication.getVersionName() + "  (" +
+                    mApplication.getVersionCode() + ")");
+            if (mApplication.isLeanback()) {
+                viewHolder.getBody().setText(R.string.app_leanback);
+            } else {
+                viewHolder.getBody().setText(R.string.app_not_leanback);
+            }
         }
     }
 }
