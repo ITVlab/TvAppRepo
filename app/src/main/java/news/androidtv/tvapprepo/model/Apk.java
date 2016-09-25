@@ -20,6 +20,9 @@ public class Apk {
     private long submissionDate;
     private int versionCode;
     private String versionName;
+    private String key;
+    private long downloads;
+    private long views;
 
     private Apk() {
     }
@@ -64,6 +67,22 @@ public class Apk {
         return versionName;
     }
 
+    public long getDownloads() {
+        return downloads;
+    }
+
+    public long getViews() {
+        return views;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
     public String toString() {
         JSONObject jsonObject = new JSONObject();
         try {
@@ -77,6 +96,9 @@ public class Apk {
             jsonObject.put("submissionDate", submissionDate);
             jsonObject.put("versionCode", versionCode);
             jsonObject.put("versionName", versionName);
+            jsonObject.put("key", key);
+            jsonObject.put("downloads", downloads);
+            jsonObject.put("views", views);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -104,6 +126,9 @@ public class Apk {
                 mApk.submissionDate = jsonObject.getLong("submissionDate");
                 mApk.versionCode = jsonObject.getInt("versionCode");
                 mApk.versionName = jsonObject.getString("versionName");
+                mApk.key = jsonObject.getString("key");
+                mApk.downloads = jsonObject.getLong("downloads");
+                mApk.views = jsonObject.getLong("views");
             } catch (JSONException e) {
                 throw new RuntimeException(e.getMessage());
             }

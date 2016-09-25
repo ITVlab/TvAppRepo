@@ -42,4 +42,10 @@
     <string name="install">Install</string>
     <string name="app_not_leanback">This app is not optimized for TVs.</string>
     <string name="app_leanback">Leanback app</string>
+    <string name="info_download_complete">Download Complete</string>
+    <string name="warning_invalid_tag">Invalid Tag</string>
+    <string name="error_starting_intent">Error starting intent</string>
+    <string name="error_download_failed">Error : Download Failed</string>
+    <string name="directory">Directory</string>
+    <string name="error_deleting_file">Error deleting file</string>
 </resources>
