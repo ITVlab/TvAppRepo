@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a connection to the Firebase database for obtaining app data.
@@ -31,6 +32,7 @@ public class RepoDatabase {
     private static RepoDatabase mRepoDatabase;
     private static HashMap<String, Apk> apps;
     private static List<Listener> listenerList;
+    private static DatabaseReference databaseReference;
 
     private RepoDatabase() {
         listenerList = new ArrayList<>();
@@ -41,40 +43,41 @@ public class RepoDatabase {
     }
 
     public static RepoDatabase getInstance(String type) {
-        // Read from the database
-        if (mRepoDatabase == null) {
-            mRepoDatabase = new RepoDatabase();
-        }
         if (apps == null) {
             apps = new HashMap<>();
         }
-        final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference(type);
-        myRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-                for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
-                    Apk value = dataSnapshot1.getValue(Apk.class);
-                    Log.d(TAG, "Value is: " + value);
-                    if (apps.containsKey(value.getPackageName()) &&
-                            apps.get(value.getPackageName()).getVersionCode() < value.getVersionCode() ||
-                            !apps.containsKey(value.getPackageName())) {
-                        for (Listener listener : listenerList) {
-                            listener.onApkAdded(value, apps.size());
+        // Read from the database
+        if (mRepoDatabase == null) {
+            mRepoDatabase = new RepoDatabase();
+            final FirebaseDatabase database = FirebaseDatabase.getInstance();
+            databaseReference = database.getReference(type);
+            databaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    // This method is called once with the initial value and again
+                    // whenever data at this location is updated.
+                    for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                        Apk value = dataSnapshot1.getValue(Apk.class);
+                        value.setKey(dataSnapshot1.getKey());
+                        Log.d(TAG, "Value is: " + value);
+                        if (apps.containsKey(value.getPackageName()) &&
+                                apps.get(value.getPackageName()).getVersionCode() < value.getVersionCode() ||
+                                !apps.containsKey(value.getPackageName())) {
+                            for (Listener listener : listenerList) {
+                                listener.onApkAdded(value, apps.size());
+                            }
+                            apps.put(value.getPackageName(), value);
                         }
-                        apps.put(value.getPackageName(), value);
                     }
                 }
-            }
 
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w(TAG, "Failed to read value.", error.toException());
-            }
-        });
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    // Failed to read value
+                    Log.w(TAG, "Failed to read value.", error.toException());
+                }
+            });
+        }
         return mRepoDatabase;
     }
 
@@ -96,6 +99,18 @@ public class RepoDatabase {
 
     public List<Apk> getAppList() {
         return new ArrayList<>(apps.values());
+    }
+
+    public void incrementApkDownloads(Apk app) {
+        Map<String, Object> map = new HashMap<>();
+        map.put(app.getKey(), app.getDownloads() + 1);
+        databaseReference.updateChildren(map);
+    }
+
+    public void incrementApkViews(Apk app) {
+        Map<String, Object> map = new HashMap<>();
+        map.put(app.getKey(), app.getViews() + 1);
+        databaseReference.updateChildren(map);
     }
 
     public interface Listener {

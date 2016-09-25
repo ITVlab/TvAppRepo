@@ -20,6 +20,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.DetailsFragment;
 import android.support.v17.leanback.widget.Action;
@@ -46,12 +48,17 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
+import java.io.File;
+
 import news.androidtv.tvapprepo.R;
 import news.androidtv.tvapprepo.Utils;
 import news.androidtv.tvapprepo.activities.DetailsActivity;
 import news.androidtv.tvapprepo.activities.MainActivity;
 import news.androidtv.tvapprepo.model.Apk;
+import news.androidtv.tvapprepo.model.RepoDatabase;
 import news.androidtv.tvapprepo.presenters.DetailsDescriptionPresenter;
+import news.androidtv.tvapprepo.utils.PackageInstallerUtils;
+import tv.puppetmaster.tinydl.PackageInstaller;
 
 /*
  * LeanbackDetailsFragment extends DetailsFragment, a Wrapper fragment for leanback details screens.
@@ -60,9 +67,6 @@ import news.androidtv.tvapprepo.presenters.DetailsDescriptionPresenter;
 public class VideoDetailsFragment extends DetailsFragment {
     private static final String TAG = VideoDetailsFragment.class.getSimpleName();
 
-    private static final int ACTION_WATCH_TRAILER = 1;
-    private static final int ACTION_RENT = 2;
-    private static final int ACTION_BUY = 3;
     private static final int ACTION_INSTALL = 11;
     private static final int ACTION_UPDATE = 12;
     private static final int ACTION_UNINSTALL = 13;
@@ -95,6 +99,7 @@ public class VideoDetailsFragment extends DetailsFragment {
             setupMovieListRowPresenter();
             updateBackground(mSelectedApk.getBanner());
             setOnItemViewClickedListener(new ItemViewClickedListener());
+            RepoDatabase.getInstance().incrementApkViews(mSelectedApk);
         } else {
             Intent intent = new Intent(getActivity(), MainActivity.class);
             startActivity(intent);
@@ -202,23 +207,6 @@ public class VideoDetailsFragment extends DetailsFragment {
         mPresenterSelector.addClassPresenter(ListRow.class, new ListRowPresenter());
     }
 
-/*    private void downloadApk() {
-        if (mApplication != null) {
-            String apkUrl = mApplication.getDownloadUrl();
-            if (mApplication.getLeanbackShortcut() != null) {
-                apkUrl += " " + mApplication.getLeanbackShortcut();
-            }
-            Intent downloadIntent;
-            // TODO Create and start download service
-            // TODO Initiate advertisement
-            // TODO Implement broadcast receiver to return to this fragment.
-        }
-    }
-
-    private void showDetails() {
-        Toast.makeText(mContext, "TODO", Toast.LENGTH_SHORT).show();
-    }*/
-
     private final class ItemViewClickedListener implements OnItemViewClickedListener {
         @Override
         public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
@@ -243,9 +231,42 @@ public class VideoDetailsFragment extends DetailsFragment {
                 Action action = (Action) item;
                 if (action.getId() == ACTION_INSTALL ||
                         action.getId() == ACTION_UPDATE) {
-                    // TODO Start installer
+                    final PackageInstaller packageInstaller = PackageInstaller.initialize(getActivity());
+                    packageInstaller.addListener(new PackageInstaller.DownloadListener() {
+                        @Override
+                        public void onApkDownloaded(File downloadedApkFile) {
+                            RepoDatabase.getInstance().incrementApkDownloads(mSelectedApk);
+                            packageInstaller.install(downloadedApkFile);
+                        }
+
+                        @Override
+                        public void onApkDownloadedNougat(final File downloadedApkFile) {
+                            RepoDatabase.getInstance().incrementApkDownloads(mSelectedApk);
+                            new Handler(Looper.getMainLooper()).postDelayed(
+                                    () -> packageInstaller.install(downloadedApkFile), 1000 * 5);
+                        }
+
+                        @Override
+                        public void onFileDeleted(File deletedApkFile, boolean wasSuccessful) {
+
+                        }
+
+                        @Override
+                        public void onProgressStarted() {
+                            // Show a video ad
+                        }
+
+                        @Override
+                        public void onProgressEnded() {
+
+                        }
+                    });
+                    packageInstaller.wget(mSelectedApk.getDownloadUrl());
+                    if (mSelectedApk.getLeanbackShortcut() != null) {
+                        packageInstaller.wget(mSelectedApk.getLeanbackShortcut());
+                    }
                 } else if (action.getId() == ACTION_UNINSTALL) {
-                    // TODO Uninstall
+                    PackageInstallerUtils.uninstallApp(getActivity(), mSelectedApk.getPackageName());
                 }
             }
         }

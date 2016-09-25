@@ -14,14 +14,17 @@
 
 package news.androidtv.tvapprepo.fragments;
 
+import java.io.File;
 import java.net.URI;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.BrowseFragment;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
@@ -35,6 +38,7 @@ import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -46,10 +50,13 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
 import news.androidtv.tvapprepo.R;
+import news.androidtv.tvapprepo.Utils;
 import news.androidtv.tvapprepo.activities.DetailsActivity;
 import news.androidtv.tvapprepo.model.Apk;
 import news.androidtv.tvapprepo.model.RepoDatabase;
 import news.androidtv.tvapprepo.presenters.ApkPresenter;
+import news.androidtv.tvapprepo.utils.PackageInstallerUtils;
+import tv.puppetmaster.tinydl.PackageInstaller;
 
 public class MainFragment extends BrowseFragment {
     private static final String TAG = "MainFragment";
@@ -92,9 +99,44 @@ public class MainFragment extends BrowseFragment {
         ApkPresenter cardPresenter = new ApkPresenter();
         final ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
         listRowAdapter.addAll(0, RepoDatabase.getInstance(RepoDatabase.DATABASE_TYPE_TESTING).getAppList());
-        RepoDatabase.getInstance(RepoDatabase.DATABASE_TYPE_TESTING).addListener(new RepoDatabase.Listener() {
-            @Override
-            public void onApkAdded(Apk apk, int index) {
+        RepoDatabase.getInstance(RepoDatabase.DATABASE_TYPE_TESTING).addListener((apk, index) -> {
+            if (apk.getPackageName().equals(Utils.class.getPackage().getName())) {
+                if (PackageInstallerUtils.isUpdateAvailable(getActivity(), apk)) {
+                    new AlertDialog.Builder(getActivity())
+                            .setTitle("There is an update for the Tv App Repo")
+                            .setPositiveButton("Update", (dialog, which) -> {
+                                PackageInstaller packageInstaller =
+                                        PackageInstaller.initialize(getActivity());
+                                packageInstaller.wget(apk.getDownloadUrl());
+                                packageInstaller.addListener(new PackageInstaller.DownloadListener() {
+                                    @Override
+                                    public void onApkDownloaded(File downloadedApkFile) {
+                                        packageInstaller.install(downloadedApkFile);
+                                    }
+
+                                    @Override
+                                    public void onApkDownloadedNougat(File downloadedApkFile) {
+                                        new Handler(Looper.getMainLooper()).postDelayed(() ->
+                                                packageInstaller.install(downloadedApkFile),
+                                                1000 * 5);
+                                    }
+
+                                    @Override
+                                    public void onFileDeleted(File deletedApkFile, boolean wasSuccessful) {
+                                    }
+
+                                    @Override
+                                    public void onProgressStarted() {
+                                    }
+
+                                    @Override
+                                    public void onProgressEnded() {
+                                    }
+                                });
+                            })
+                            .show();
+                }
+            } else {
                 listRowAdapter.add(apk);
                 listRowAdapter.notifyArrayItemRangeChanged(index, 1);
             }
@@ -128,14 +170,9 @@ public class MainFragment extends BrowseFragment {
     }
 
     private void setupEventListeners() {
-        setOnSearchClickedListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
+        setOnSearchClickedListener(view ->
                 Toast.makeText(getActivity(), "Implement your own in-app search", Toast.LENGTH_LONG)
-                        .show();
-            }
-        });
+                .show());
 
         setOnItemViewClickedListener(new ItemViewClickedListener());
         setOnItemViewSelectedListener(new ItemViewSelectedListener());
