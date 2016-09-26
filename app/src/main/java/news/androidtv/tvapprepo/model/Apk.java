@@ -1,5 +1,7 @@
 package news.androidtv.tvapprepo.model;
 
+import com.google.firebase.database.ThrowOnExtraProperties;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -17,7 +19,7 @@ public class Apk {
     private String leanbackShortcut;
     private String name;
     private String packageName;
-    private long submissionDate;
+    private long submitted;
     private int versionCode;
     private String versionName;
     private String key;
@@ -39,7 +41,7 @@ public class Apk {
         return icon;
     }
 
-    public boolean isLeanback() {
+    public boolean hasLeanback() {
         return isLeanback;
     }
 
@@ -56,7 +58,7 @@ public class Apk {
     }
 
     public long getSubmissionDate() {
-        return submissionDate;
+        return submitted;
     }
 
     public int getVersionCode() {
@@ -83,6 +85,14 @@ public class Apk {
         this.key = key;
     }
 
+    public void setIsLeanback(Boolean leanback) {
+        isLeanback = leanback;
+    }
+
+    public void setSubmitted(long submitted) {
+        this.submitted = submitted;
+    }
+
     public String toString() {
         JSONObject jsonObject = new JSONObject();
         try {
@@ -93,7 +103,7 @@ public class Apk {
             jsonObject.put("downloadUrl", downloadUrl);
             jsonObject.put("leanbackShortcut", leanbackShortcut);
             jsonObject.put("packageName", packageName);
-            jsonObject.put("submissionDate", submissionDate);
+            jsonObject.put("submissionDate", submitted);
             jsonObject.put("versionCode", versionCode);
             jsonObject.put("versionName", versionName);
             jsonObject.put("key", key);
@@ -121,9 +131,11 @@ public class Apk {
                 mApk.icon = jsonObject.getString("icon");
                 mApk.isLeanback = jsonObject.getBoolean("isLeanback");
                 mApk.downloadUrl = jsonObject.getString("downloadUrl");
-                mApk.leanbackShortcut = jsonObject.getString("leanbackShortcut");
+                if (jsonObject.has("leanbackShortcut")) {
+                    mApk.leanbackShortcut = jsonObject.getString("leanbackShortcut");
+                }
                 mApk.packageName = jsonObject.getString("packageName");
-                mApk.submissionDate = jsonObject.getLong("submissionDate");
+                mApk.submitted = jsonObject.getLong("submissionDate");
                 mApk.versionCode = jsonObject.getInt("versionCode");
                 mApk.versionName = jsonObject.getString("versionName");
                 mApk.key = jsonObject.getString("key");
