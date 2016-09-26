@@ -78,3 +78,5 @@ captures/
 
 # For python keys
 python/keys.txt
+app/google-services.json
+

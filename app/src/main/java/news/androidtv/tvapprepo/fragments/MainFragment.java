@@ -143,7 +143,8 @@ public class MainFragment extends BrowseFragment {
         });
         HeaderItem header = new HeaderItem(0, "Browse");
         mRowsAdapter.add(new ListRow(header, listRowAdapter));
-
+        // TODO Add credits for TinyDL
+        // TODO Add a TinyDL downloader
         setAdapter(mRowsAdapter);
     }
 
@@ -166,13 +167,13 @@ public class MainFragment extends BrowseFragment {
         // set fastLane (or headers) background color
         setBrandColor(getResources().getColor(R.color.fastlane_background));
         // set search icon color
-        setSearchAffordanceColor(getResources().getColor(R.color.search_opaque));
+//        setSearchAffordanceColor(getResources().getColor(R.color.search_opaque));
     }
 
     private void setupEventListeners() {
-        setOnSearchClickedListener(view ->
+/*        setOnSearchClickedListener(view ->
                 Toast.makeText(getActivity(), "Implement your own in-app search", Toast.LENGTH_LONG)
-                .show());
+                .show());*/
 
         setOnItemViewClickedListener(new ItemViewClickedListener());
         setOnItemViewSelectedListener(new ItemViewSelectedListener());
