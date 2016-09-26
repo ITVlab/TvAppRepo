@@ -6,6 +6,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -102,15 +104,35 @@ public class RepoDatabase {
     }
 
     public void incrementApkDownloads(Apk app) {
-        Map<String, Object> map = new HashMap<>();
-        map.put(app.getKey(), app.getDownloads() + 1);
-        databaseReference.updateChildren(map);
+        databaseReference.child(app.getKey()).child("downloads").runTransaction(
+                new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Long updatedViews = mutableData.getValue(Long.class) + 1;
+                mutableData.setValue(updatedViews);
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+            }
+        });
     }
 
     public void incrementApkViews(Apk app) {
-        Map<String, Object> map = new HashMap<>();
-        map.put(app.getKey(), app.getViews() + 1);
-        databaseReference.updateChildren(map);
+        databaseReference.child(app.getKey()).child("views").runTransaction(
+                new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Long updatedViews = mutableData.getValue(Long.class) + 1;
+                mutableData.setValue(updatedViews);
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+            }
+        });
     }
 
     public interface Listener {

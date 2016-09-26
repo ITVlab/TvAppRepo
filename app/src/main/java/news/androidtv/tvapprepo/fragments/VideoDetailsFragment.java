@@ -82,6 +82,7 @@ public class VideoDetailsFragment extends DetailsFragment {
     private BackgroundManager mBackgroundManager;
     private Drawable mDefaultBackground;
     private DisplayMetrics mMetrics;
+    private PackageInstaller mPackageInstaller;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -99,6 +100,7 @@ public class VideoDetailsFragment extends DetailsFragment {
             setupMovieListRowPresenter();
             updateBackground(mSelectedApk.getBanner());
             setOnItemViewClickedListener(new ItemViewClickedListener());
+            mPackageInstaller = PackageInstaller.initialize(getActivity());
             RepoDatabase.getInstance().incrementApkViews(mSelectedApk);
         } else {
             Intent intent = new Intent(getActivity(), MainActivity.class);
@@ -110,6 +112,7 @@ public class VideoDetailsFragment extends DetailsFragment {
     @Override
     public void onStop() {
         super.onStop();
+        mPackageInstaller.destroy();
     }
 
     private void prepareBackgroundManager() {
@@ -178,8 +181,8 @@ public class VideoDetailsFragment extends DetailsFragment {
                     new Action(ACTION_UNINSTALL, getString(R.string.uninstall)));
         } catch (PackageManager.NameNotFoundException e) {
             // App is not installed
-            possibleActions.set(ACTION_UNINSTALL,
-                    new Action(ACTION_UNINSTALL, getString(R.string.install)));
+            possibleActions.set(ACTION_INSTALL,
+                    new Action(ACTION_INSTALL, getString(R.string.install)));
         }
         row.setActionsAdapter(possibleActions);
 
@@ -231,19 +234,18 @@ public class VideoDetailsFragment extends DetailsFragment {
                 Action action = (Action) item;
                 if (action.getId() == ACTION_INSTALL ||
                         action.getId() == ACTION_UPDATE) {
-                    final PackageInstaller packageInstaller = PackageInstaller.initialize(getActivity());
-                    packageInstaller.addListener(new PackageInstaller.DownloadListener() {
+                    mPackageInstaller.addListener(new PackageInstaller.DownloadListener() {
                         @Override
                         public void onApkDownloaded(File downloadedApkFile) {
                             RepoDatabase.getInstance().incrementApkDownloads(mSelectedApk);
-                            packageInstaller.install(downloadedApkFile);
+                            mPackageInstaller.install(downloadedApkFile);
                         }
 
                         @Override
                         public void onApkDownloadedNougat(final File downloadedApkFile) {
                             RepoDatabase.getInstance().incrementApkDownloads(mSelectedApk);
                             new Handler(Looper.getMainLooper()).postDelayed(
-                                    () -> packageInstaller.install(downloadedApkFile), 1000 * 5);
+                                    () -> mPackageInstaller.install(downloadedApkFile), 1000 * 5);
                         }
 
                         @Override
@@ -261,9 +263,9 @@ public class VideoDetailsFragment extends DetailsFragment {
 
                         }
                     });
-                    packageInstaller.wget(mSelectedApk.getDownloadUrl());
+                    mPackageInstaller.wget(mSelectedApk.getDownloadUrl());
                     if (mSelectedApk.getLeanbackShortcut() != null) {
-                        packageInstaller.wget(mSelectedApk.getLeanbackShortcut());
+                        mPackageInstaller.wget(mSelectedApk.getLeanbackShortcut());
                     }
                 } else if (action.getId() == ACTION_UNINSTALL) {
                     PackageInstallerUtils.uninstallApp(getActivity(), mSelectedApk.getPackageName());
