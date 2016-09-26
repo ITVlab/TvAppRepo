@@ -6,6 +6,8 @@
 .DS_Store
 /build
 /captures
+/python/temp_apk
+/python/leanback_shortcuts
 =======
 # Built application files
 *.apk

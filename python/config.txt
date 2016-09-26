@@ -1,1 +1,1 @@
-SHORTCUT_APK_DIRECTORY=
+SHORTCUT_APK_DIRECTORY=/mnt/c/Users/Nick/Development/Shortcut/
