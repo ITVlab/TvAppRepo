@@ -70,11 +70,13 @@ public class PackageInstaller {
                     if (uriString != null && uriString.endsWith(".apk")) {
                         Toast.makeText(ctxt, R.string.info_download_complete, Toast.LENGTH_LONG).show();
                         if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                            Log.d(TAG, "Downloaded " + uriString + " on a < 24 device.");
                             for (DownloadListener callback : callbackList) {
                                 callback.onApkDownloaded(new File(Uri.parse(uriString).getPath()));
                             }
                         } else {
                             // TODO: Nougat install upon download yields "There was a problem parsing the package"
+                            Log.d(TAG, "Downloaded " + uriString + " on a Nougat device.");
                             for (DownloadListener callback : callbackList) {
                                 callback.onApkDownloadedNougat(new File(Uri.parse(uriString).getPath()));
                             }

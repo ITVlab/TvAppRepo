@@ -25,6 +25,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.BrowseFragment;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
@@ -43,8 +44,11 @@ import android.support.v7.view.ContextThemeWrapper;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
@@ -154,9 +158,18 @@ public class MainFragment extends BrowseFragment {
         ArrayObjectAdapter optionsRowAdapter = new ArrayObjectAdapter(optionsCardPresenter);
         optionsRowAdapter.add(new SettingOption(
                 getResources().getDrawable(R.drawable.app_icon_quantum),
-                "Download from tinyurl",
+                "Install through tag",
                 () -> {
-                    Toast.makeText(getActivity(), "Nick, do this later.", Toast.LENGTH_SHORT).show();
+                    new MaterialDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
+                            .title("#SIDELOADTAG")
+                            .customView(R.layout.dialog_sideload_tag, false)
+                            .onPositive((dialog, which) -> {
+                                String tag = ((EditText) dialog.getCustomView().findViewById(R.id.tag)).getText().toString();
+                                PackageInstaller.initialize(getActivity()).wget("http://tinyurl.com/" + tag);
+                                Toast.makeText(getActivity(), "Starting download...", Toast.LENGTH_SHORT).show();
+                            })
+                            .positiveText("Download")
+                            .show();
                 }
         ));
         optionsRowAdapter.add(new SettingOption(
