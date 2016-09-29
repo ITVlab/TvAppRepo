@@ -2,4 +2,15 @@
 <resources>
 
     <style name="AppTheme" parent="@style/Theme.Leanback"></style>
+
+    <style name="OptionsImageCardViewStyle" parent="Widget.Leanback.ImageCardViewStyle">
+        <item name="cardBackground">@color/primary</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="lbImageCardViewType">Title</item>
+        <item name="android:maxLines">5</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
+
+    <style name="dialog_theme" parent="Theme.AppCompat.NoActionBar" />
 </resources>

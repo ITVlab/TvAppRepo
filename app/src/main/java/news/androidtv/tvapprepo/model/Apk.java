@@ -1,7 +1,5 @@
 package news.androidtv.tvapprepo.model;
 
-import com.google.firebase.database.ThrowOnExtraProperties;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
