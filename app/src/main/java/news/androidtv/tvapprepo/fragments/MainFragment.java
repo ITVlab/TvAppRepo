@@ -39,6 +39,7 @@ import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.view.ContextThemeWrapper;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -54,7 +55,9 @@ import news.androidtv.tvapprepo.Utils;
 import news.androidtv.tvapprepo.activities.DetailsActivity;
 import news.androidtv.tvapprepo.model.Apk;
 import news.androidtv.tvapprepo.model.RepoDatabase;
+import news.androidtv.tvapprepo.model.SettingOption;
 import news.androidtv.tvapprepo.presenters.ApkPresenter;
+import news.androidtv.tvapprepo.presenters.OptionsCardPresenter;
 import news.androidtv.tvapprepo.utils.PackageInstallerUtils;
 import tv.puppetmaster.tinydl.PackageInstaller;
 
@@ -96,13 +99,15 @@ public class MainFragment extends BrowseFragment {
 
     private void loadRows() {
         mRowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
+
+        // Add a presenter for APKs
         ApkPresenter cardPresenter = new ApkPresenter();
         final ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
         listRowAdapter.addAll(0, RepoDatabase.getInstance(RepoDatabase.DATABASE_TYPE_TESTING).getAppList());
         RepoDatabase.getInstance(RepoDatabase.DATABASE_TYPE_TESTING).addListener((apk, index) -> {
             if (apk.getPackageName().equals(Utils.class.getPackage().getName())) {
                 if (PackageInstallerUtils.isUpdateAvailable(getActivity(), apk)) {
-                    new AlertDialog.Builder(getActivity())
+                    new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
                             .setTitle("There is an update for the Tv App Repo")
                             .setPositiveButton("Update", (dialog, which) -> {
                                 PackageInstaller packageInstaller =
@@ -143,8 +148,30 @@ public class MainFragment extends BrowseFragment {
         });
         HeaderItem header = new HeaderItem(0, "Browse");
         mRowsAdapter.add(new ListRow(header, listRowAdapter));
-        // TODO Add credits for TinyDL
-        // TODO Add a TinyDL downloader
+
+        // Add a row for credits
+        OptionsCardPresenter optionsCardPresenter = new OptionsCardPresenter();
+        ArrayObjectAdapter optionsRowAdapter = new ArrayObjectAdapter(optionsCardPresenter);
+        optionsRowAdapter.add(new SettingOption(
+                getResources().getDrawable(R.drawable.app_icon_quantum),
+                "Download from tinyurl",
+                () -> {
+                    Toast.makeText(getActivity(), "Nick, do this later.", Toast.LENGTH_SHORT).show();
+                }
+        ));
+        optionsRowAdapter.add(new SettingOption(
+                getResources().getDrawable(R.drawable.app_icon_quantum),
+                "Credits",
+                () -> {
+                    new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
+                            .setTitle("Credits")
+                            .setMessage("Built by ITV Lab.\n\nUses open source code from #SIDELOADTAG")
+                            .show();
+                }
+        ));
+        header = new HeaderItem(1, "More");
+        mRowsAdapter.add(new ListRow(header, optionsRowAdapter));
+
         setAdapter(mRowsAdapter);
     }
 
@@ -221,6 +248,8 @@ public class MainFragment extends BrowseFragment {
                         ((ImageCardView) itemViewHolder.view).getMainImageView(),
                         DetailsActivity.SHARED_ELEMENT_NAME).toBundle();
                 getActivity().startActivity(intent, bundle);
+            } else if (item instanceof SettingOption) {
+                ((SettingOption) item).getClickListener().onClick();
             }
         }
     }
