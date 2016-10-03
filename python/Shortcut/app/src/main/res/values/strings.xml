@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name"></string>
+    <string name="activity_to_launch">null</string>
+    <string name="package_name">com.sample</string>
+</resources>

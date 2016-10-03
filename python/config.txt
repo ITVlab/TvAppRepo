@@ -1,2 +1,2 @@
-SHORTCUT_APK_DIRECTORY=/mnt/c/Users/Nick/Development/Shortcut/
-ANDROID_SDK_LOCATION=/mnt/c/Users/Nick/AppData/Local/Android/sdk
+SHORTCUT_APK_DIRECTORY=c:/Users/Nick/Development/tvapprepo/TvAppRepo/python/Shortcut
+ANDROID_SDK_LOCATION=c:/Users/Nick/AppData/Local/Android/sdk
