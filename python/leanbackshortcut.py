@@ -30,19 +30,34 @@ def clone_shortcut():
     print 'Reading from config.txt'
     for line in f:
         if "SHORTCUT_APK_DIRECTORY=" in line:
-            uri = line[23:]
+            uri = line[23:].strip()
             copy_tree(uri, './temp_apk')
             
 def compile_app(packageName):
+    # Change our local properties
+    f = open('config.txt', 'r')
+    print 'Reading from config.txt'
+    for line in f:
+        if "ANDROID_SDK_LOCATION=" in line:
+            uri = line[21:].strip()
+            localProperties = open('./temp_apk/local.properties', 'w')
+            localProperties.write('sdk.dir=' + uri)
+            os.environ['ANDROID_HOME'] = uri
+            print 'Android SDK location set to ' + uri
     # Once everything is good, program from cmd line
-    call(['./temp_apk/gradlew'])
+    # call(['./temp_apk/gradlew'])
+    print 'Building APK...'
     # Is it good? Let's assume so
-    call(['./temp_apk/gradlew', 'assembleRelease'])
+    os.chdir('temp_apk/');
+    call(['./gradlew', 'clean'])
+    call(['./gradlew', 'assembleRelease', '--info', '--debug', '--stacktrace'])
+    os.chdir('../');
     # file should be in ./temp_apk/app/app-release.apk
     upload_apk(packageName)
     
-def upload_apk():
+def upload_apk(packageName):
     # Move to another directory
+    print 'APK created.'
     shutil.move('./temp_apk/app/app-release.apk', './leanback_shortcuts/' + packageName + '.apk')
     print 'Moved to leanback_shortcuts/' + packageName + '.apk'
     # Upload to Firebase
@@ -54,6 +69,15 @@ def generate_apk(appName, packageName, banner):
     replace('./temp_apk/app/build.gradle', 
             'applicationId "news.androidtv.shortcut"',
             'applicationId "news.androidtv.shortcutgo.' + packageName + '"')
+    # Edit Manifest
+    replace('./temp_apk/app/src/main/AndroidManifest.xml', 
+            'package="com.sample"',
+            'package="news.androidtv.shortcutgo.' + packageName + '"')
+    # Update MainActivity
+    replace('./temp_apk/app/src/main/java/news/android/shortcut/MainActivity.java', 
+            'import com.sample.R;',
+            'import news.androidtv.shortcutgo.' + packageName + ';')
+    
     write_keys()
     # Edit strings.xml
     strings = open('./temp_apk/app/src/main/res/values/strings.xml', 'w')
@@ -81,8 +105,8 @@ def replace(file_path, pattern, subst):
     # Remove original file
     os.remove(file_path)
     # Move new file
-    print "Temporarily copied gradle to " + abs_path
-    print "Rewriting gradle at " + file_path
+    print "Temporarily copied file to " + abs_path
+    print "Rewriting file at " + file_path
     shutil.move(abs_path, file_path)
     
 # MAIN EXECUTION
