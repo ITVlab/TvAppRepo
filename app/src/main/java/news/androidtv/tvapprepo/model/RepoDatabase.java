@@ -24,6 +24,7 @@ import java.util.Map;
  */
 public class RepoDatabase {
     private static final String TAG = RepoDatabase.class.getSimpleName();
+    private static final boolean DEBUG = true;
 
     public static final String DATABASE_TYPE_TESTING = "test";
     public static final String DATABASE_TYPE_PROD = "production";
@@ -135,27 +136,52 @@ public class RepoDatabase {
         });
     }
 
-    public static void getLeanbackShortcut(String packageName, LeanbackShortcutCallback callback) {
+    public static void getLeanbackShortcut(String packageName, final LeanbackShortcutCallback callback) {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference("leanbackShortcuts");
         DatabaseReference shortcutReference = reference.child(packageName.replaceAll("[.]", "_"));
-        if (shortcutReference == null) {
-            callback.onNoLeanbackShortcut();
-        } else {
-            shortcutReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
+        if (DEBUG) {
+            Log.d(TAG, "Looking at shortcut reference " + shortcutReference.toString());
+            Log.d(TAG, "Looking for package " + packageName);
+        }
+
+        shortcutReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (DEBUG) {
+                    Log.d(TAG, "Got value back " + dataSnapshot.toString());
+                }
+                try {
                     LeanbackShortcut leanbackShortcut =
                             dataSnapshot.getValue(LeanbackShortcut.class);
+                    if (leanbackShortcut == null) {
+                        if (DEBUG) {
+                            Log.i(TAG, "No leanback shortcut");
+                        }
+                        callback.onNoLeanbackShortcut();
+                        return;
+                    }
+                    if (DEBUG) {
+                        Log.i(TAG, "This is a leanback shortcut");
+                    }
                     callback.onLeanbackShortcut(leanbackShortcut);
+                } catch (Exception e) {
+                    if (DEBUG) {
+                        Log.i(TAG, "No leanback shortcut");
+                        Log.e(TAG, e.getMessage());
+                    }
+                    callback.onNoLeanbackShortcut();
                 }
+            }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    callback.onDatabaseError(databaseError);
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                if (DEBUG) {
+                    Log.e(TAG, databaseError.toString());
                 }
-            });
-        }
+                callback.onDatabaseError(databaseError);
+            }
+        });
     }
 
     public interface Listener {

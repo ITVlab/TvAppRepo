@@ -130,6 +130,12 @@ public class MainFragment extends BrowseFragment {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadRows();
+    }
+
     private void loadRows() {
         mRowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
 

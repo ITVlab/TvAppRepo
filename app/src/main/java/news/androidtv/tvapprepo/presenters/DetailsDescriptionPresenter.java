@@ -17,6 +17,7 @@ package news.androidtv.tvapprepo.presenters;
 import android.content.Context;
 import android.support.v17.leanback.widget.AbstractDetailsDescriptionPresenter;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.google.firebase.database.DatabaseError;
 
@@ -39,22 +40,24 @@ public class DetailsDescriptionPresenter extends AbstractDetailsDescriptionPrese
     }
 
     @Override
-    protected void onBindDescription(ViewHolder viewHolder, Object item) {
+    protected void onBindDescription(final ViewHolder viewHolder, final Object item) {
         mApplication = (Apk) item;
 
         if (mApplication != null) {
             viewHolder.getTitle().setText(mApplication.getName());
-            viewHolder.getSubtitle().setText(mApplication.getVersionName() + "  (" +
+            viewHolder.getSubtitle().setText("Version " + mApplication.getVersionName() + "  (" +
                     mApplication.getVersionCode() + ")");
             RepoDatabase.getLeanbackShortcut(mApplication.getPackageName(),
                     new RepoDatabase.LeanbackShortcutCallback() {
                 @Override
                 public void onNoLeanbackShortcut() {
+                    Log.d(TAG, "This app does not have a LeanbackShortcut");
                     viewHolder.getBody().setText(R.string.app_leanback);
                 }
 
                 @Override
                 public void onLeanbackShortcut(LeanbackShortcut leanbackShortcut) {
+                    Log.d(TAG, "This app has a LeanbackShortcut");
                     viewHolder.getBody().setText(R.string.app_not_leanback);
                 }
 

@@ -125,11 +125,20 @@ public class PackageInstaller {
         if (!chmod()) {
             return;
         }
+        if (DEBUG) {
+            Log.i(TAG, "wget " + downloadUrl);
+        }
         progressStart();
         if (downloadUrl.isEmpty()) {
             progressStop();
+            if (DEBUG) {
+                Log.e(TAG, "Download Url '" + downloadUrl + "' detected as empty");
+            }
             Toast.makeText(mActivity, R.string.warning_invalid_tag, Toast.LENGTH_LONG).show();
         } else {
+            if (DEBUG) {
+                Log.i(TAG, "Starting download");
+            }
             new DownloadFile().execute(downloadUrl);
         }
     }
@@ -211,7 +220,7 @@ public class PackageInstaller {
                 con.getHeaderFields();
                 downloadUri = con.getURL().toString();
             } catch (Exception ex) {
-                Log.e("DownloadFile", "Connection error", ex);
+                Log.e(TAG, "Download connection error", ex);
             }
             if (downloadUri == null) {
                 return R.string.error_download_failed;
@@ -228,12 +237,14 @@ public class PackageInstaller {
             final DownloadManager manager =
                     (DownloadManager) mActivity.getSystemService(Context.DOWNLOAD_SERVICE);
             manager.enqueue(request);
+            Log.i(TAG, "Download request for " + urls[0] + " enqueued");
             return -1;
         }
 
         @Override
         protected void onPostExecute(Integer failureMessage) {
             if (failureMessage >= 0) {
+                Log.e(TAG, "Download manager failed, error code " + failureMessage);
                 progressStop();
                 Toast.makeText(mActivity, failureMessage, Toast.LENGTH_LONG).show();
             }
