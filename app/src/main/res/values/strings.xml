@@ -12,7 +12,6 @@
     <string name="play_pause_description">Play Pause Button</string>
     <string name="loading">Loading&#8230;</string>
     <string name="no_video_found">No video was found</string>
-    <string name="about_app">About DemoCast Player</string>
     <string name="version">Version: %1$s</string>
     <string name="popular_header">Popular Videos</string>
     <string name="preferences">PREFERENCES</string>
@@ -48,4 +47,14 @@
     <string name="error_download_failed">Error : Download Failed</string>
     <string name="directory">Directory</string>
     <string name="error_deleting_file">Error deleting file</string>
+    <string name="header_downloaded_apks">Downloaded APKs</string>
+    <string name="install_through_sideloadtag">Install through tag</string>
+    <string name="sideloadtag">#SIDELOADTAG</string>
+    <string name="starting_download">Starting download...</string>
+    <string name="Download">Download</string>
+    <string name="credits">Credits</string>
+    <string name="about_app">Built by ITV Lab.\n\nUses open source code from #SIDELOADTAG\n\nUses data from APK Mirror. We are not affiliated with APK Mirror.</string>
+    <string name="update_for_tv_app_repo">There is an update for the Tv App Repo</string>
+    <string name="header_more">More</string>
+    <string name="header_browse">Browse</string>
 </resources>

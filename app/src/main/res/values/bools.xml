@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="ENABLE_SIDELOADTAG">true</bool>
+    <bool name="ENABLE_DOWNLOADS_ROW">true</bool>
+</resources>

@@ -16,14 +16,21 @@ package news.androidtv.tvapprepo.presenters;
 
 import android.content.Context;
 import android.support.v17.leanback.widget.AbstractDetailsDescriptionPresenter;
+import android.util.Log;
+
+import com.google.firebase.database.DatabaseError;
 
 import news.androidtv.tvapprepo.R;
 import news.androidtv.tvapprepo.model.Apk;
+import news.androidtv.tvapprepo.model.LeanbackShortcut;
+import news.androidtv.tvapprepo.model.RepoDatabase;
 
 /**
  * This presenter provides a detailed
  */
 public class DetailsDescriptionPresenter extends AbstractDetailsDescriptionPresenter {
+    private static final String TAG = DetailsDescriptionPresenter.class.getSimpleName();
+
     private Apk mApplication;
     private Context mContext;
 
@@ -39,11 +46,23 @@ public class DetailsDescriptionPresenter extends AbstractDetailsDescriptionPrese
             viewHolder.getTitle().setText(mApplication.getName());
             viewHolder.getSubtitle().setText(mApplication.getVersionName() + "  (" +
                     mApplication.getVersionCode() + ")");
-            if (mApplication.hasLeanback()) {
-                viewHolder.getBody().setText(R.string.app_leanback);
-            } else {
-                viewHolder.getBody().setText(R.string.app_not_leanback);
-            }
+            RepoDatabase.getLeanbackShortcut(mApplication.getPackageName(),
+                    new RepoDatabase.LeanbackShortcutCallback() {
+                @Override
+                public void onNoLeanbackShortcut() {
+                    viewHolder.getBody().setText(R.string.app_leanback);
+                }
+
+                @Override
+                public void onLeanbackShortcut(LeanbackShortcut leanbackShortcut) {
+                    viewHolder.getBody().setText(R.string.app_not_leanback);
+                }
+
+                @Override
+                public void onDatabaseError(DatabaseError error) {
+                    Log.e(TAG, error.getMessage());
+                }
+            });
         }
     }
 }

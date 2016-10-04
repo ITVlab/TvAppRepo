@@ -47,6 +47,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.google.firebase.database.DatabaseError;
 
 import java.io.File;
 
@@ -55,6 +56,7 @@ import news.androidtv.tvapprepo.Utils;
 import news.androidtv.tvapprepo.activities.DetailsActivity;
 import news.androidtv.tvapprepo.activities.MainActivity;
 import news.androidtv.tvapprepo.model.Apk;
+import news.androidtv.tvapprepo.model.LeanbackShortcut;
 import news.androidtv.tvapprepo.model.RepoDatabase;
 import news.androidtv.tvapprepo.presenters.DetailsDescriptionPresenter;
 import news.androidtv.tvapprepo.utils.PackageInstallerUtils;
@@ -234,39 +236,26 @@ public class VideoDetailsFragment extends DetailsFragment {
                 Action action = (Action) item;
                 if (action.getId() == ACTION_INSTALL ||
                         action.getId() == ACTION_UPDATE) {
-                    mPackageInstaller.addListener(new PackageInstaller.DownloadListener() {
-                        @Override
-                        public void onApkDownloaded(File downloadedApkFile) {
-                            RepoDatabase.getInstance().incrementApkDownloads(mSelectedApk);
-                            mPackageInstaller.install(downloadedApkFile);
-                        }
 
+                    RepoDatabase.getInstance().incrementApkDownloads(mSelectedApk);
+                    mPackageInstaller.wget(mSelectedApk.getDownloadUrl());
+                    RepoDatabase.getLeanbackShortcut(mSelectedApk.getPackageName(),
+                            new RepoDatabase.LeanbackShortcutCallback() {
                         @Override
-                        public void onApkDownloadedNougat(final File downloadedApkFile) {
-                            RepoDatabase.getInstance().incrementApkDownloads(mSelectedApk);
-                            new Handler(Looper.getMainLooper()).postDelayed(
-                                    () -> mPackageInstaller.install(downloadedApkFile), 1000 * 5);
-                        }
-
-                        @Override
-                        public void onFileDeleted(File deletedApkFile, boolean wasSuccessful) {
+                        public void onNoLeanbackShortcut() {
 
                         }
 
                         @Override
-                        public void onProgressStarted() {
-                            // Show a video ad
+                        public void onLeanbackShortcut(LeanbackShortcut leanbackShortcut) {
+                            mPackageInstaller.wget(leanbackShortcut.getDownload());
                         }
 
                         @Override
-                        public void onProgressEnded() {
+                        public void onDatabaseError(DatabaseError error) {
 
                         }
                     });
-                    mPackageInstaller.wget(mSelectedApk.getDownloadUrl());
-                    if (mSelectedApk.getLeanbackShortcut() != null) {
-                        mPackageInstaller.wget(mSelectedApk.getLeanbackShortcut());
-                    }
                 } else if (action.getId() == ACTION_UNINSTALL) {
                     PackageInstallerUtils.uninstallApp(getActivity(), mSelectedApk.getPackageName());
                 }

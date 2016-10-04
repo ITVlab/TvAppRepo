@@ -16,16 +16,18 @@ package news.androidtv.tvapprepo.fragments;
 
 import java.io.File;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.BrowseFragment;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
@@ -43,11 +45,9 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ContextThemeWrapper;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
@@ -61,6 +61,7 @@ import news.androidtv.tvapprepo.model.Apk;
 import news.androidtv.tvapprepo.model.RepoDatabase;
 import news.androidtv.tvapprepo.model.SettingOption;
 import news.androidtv.tvapprepo.presenters.ApkPresenter;
+import news.androidtv.tvapprepo.presenters.DownloadedFilesPresenter;
 import news.androidtv.tvapprepo.presenters.OptionsCardPresenter;
 import news.androidtv.tvapprepo.utils.PackageInstallerUtils;
 import tv.puppetmaster.tinydl.PackageInstaller;
@@ -81,6 +82,34 @@ public class MainFragment extends BrowseFragment {
     private Timer mBackgroundTimer;
     private URI mBackgroundURI;
     private BackgroundManager mBackgroundManager;
+    private PackageInstaller mPackageInstaller;
+    private PackageInstaller.DownloadListener mDownloadListener = new PackageInstaller.DownloadListener() {
+        @Override
+        public void onApkDownloaded(File downloadedApkFile) {
+            mPackageInstaller.install(downloadedApkFile);
+        }
+
+        @Override
+        public void onApkDownloadedNougat(final File downloadedApkFile) {
+            new Handler(Looper.getMainLooper()).postDelayed(
+                    () -> mPackageInstaller.install(downloadedApkFile), 1000 * 5);
+        }
+
+        @Override
+        public void onFileDeleted(File deletedApkFile, boolean wasSuccessful) {
+
+        }
+
+        @Override
+        public void onProgressStarted() {
+            // Show a video ad
+        }
+
+        @Override
+        public void onProgressEnded() {
+
+        }
+    };
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -104,6 +133,10 @@ public class MainFragment extends BrowseFragment {
     private void loadRows() {
         mRowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
 
+        mPackageInstaller = PackageInstaller.initialize(getActivity());
+        // Setup the package installer for the session
+        mPackageInstaller.addListener(mDownloadListener);
+
         // Add a presenter for APKs
         ApkPresenter cardPresenter = new ApkPresenter();
         final ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
@@ -112,37 +145,10 @@ public class MainFragment extends BrowseFragment {
             if (apk.getPackageName().equals(Utils.class.getPackage().getName())) {
                 if (PackageInstallerUtils.isUpdateAvailable(getActivity(), apk)) {
                     new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
-                            .setTitle("There is an update for the Tv App Repo")
-                            .setPositiveButton("Update", (dialog, which) -> {
-                                PackageInstaller packageInstaller =
-                                        PackageInstaller.initialize(getActivity());
-                                packageInstaller.wget(apk.getDownloadUrl());
-                                packageInstaller.addListener(new PackageInstaller.DownloadListener() {
-                                    @Override
-                                    public void onApkDownloaded(File downloadedApkFile) {
-                                        packageInstaller.install(downloadedApkFile);
-                                    }
-
-                                    @Override
-                                    public void onApkDownloadedNougat(File downloadedApkFile) {
-                                        new Handler(Looper.getMainLooper()).postDelayed(() ->
-                                                packageInstaller.install(downloadedApkFile),
-                                                1000 * 5);
-                                    }
-
-                                    @Override
-                                    public void onFileDeleted(File deletedApkFile, boolean wasSuccessful) {
-                                    }
-
-                                    @Override
-                                    public void onProgressStarted() {
-                                    }
-
-                                    @Override
-                                    public void onProgressEnded() {
-                                    }
-                                });
-                            })
+                            .setTitle(R.string.update_for_tv_app_repo)
+                            .setPositiveButton(R.string.update, (dialog, which) ->
+                                mPackageInstaller.wget(apk.getDownloadUrl())
+                            )
                             .show();
                 }
             } else {
@@ -150,39 +156,64 @@ public class MainFragment extends BrowseFragment {
                 listRowAdapter.notifyArrayItemRangeChanged(index, 1);
             }
         });
-        HeaderItem header = new HeaderItem(0, "Browse");
+        HeaderItem header = new HeaderItem(0, getString(R.string.header_browse));
         mRowsAdapter.add(new ListRow(header, listRowAdapter));
+
+        if (getResources().getBoolean(R.bool.ENABLE_DOWNLOADS_ROW)) {
+            // Add a row for downloaded APKs
+            DownloadedFilesPresenter downloadedFilesPresenter = new DownloadedFilesPresenter();
+            ArrayObjectAdapter downloadedFilesAdapter = new ArrayObjectAdapter(downloadedFilesPresenter);
+            File myDownloads = Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DOWNLOADS);
+            // Add them to a list first before we sort them.
+            List<File> downloadedFilesList = new ArrayList<>();
+            for (File download : myDownloads.listFiles()) {
+                if (download.getName().endsWith(".apk")) {
+                    // Is an APK!
+                    downloadedFilesList.add(download);
+                }
+            }
+
+            // Now sort
+            Collections.sort(downloadedFilesList, (o1, o2) ->
+                    (int) (o2.lastModified() - o1.lastModified()));
+            downloadedFilesAdapter.addAll(0, downloadedFilesList);
+            HeaderItem downloadedFilesHeader = new HeaderItem(1, getString(R.string.header_downloaded_apks));
+            mRowsAdapter.add(new ListRow(downloadedFilesHeader, downloadedFilesAdapter));
+        }
 
         // Add a row for credits
         OptionsCardPresenter optionsCardPresenter = new OptionsCardPresenter();
         ArrayObjectAdapter optionsRowAdapter = new ArrayObjectAdapter(optionsCardPresenter);
+        if (getResources().getBoolean(R.bool.ENABLE_SIDELOADTAG)) {
+            optionsRowAdapter.add(new SettingOption(
+                    getResources().getDrawable(R.drawable.app_icon_quantum),
+                    getString(R.string.install_through_sideloadtag),
+                    () -> {
+                        new MaterialDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
+                                .title(R.string.sideloadtag)
+                                .customView(R.layout.dialog_sideload_tag, false)
+                                .onPositive((dialog, which) -> {
+                                    String tag = ((EditText) dialog.getCustomView().findViewById(R.id.tag)).getText().toString();
+                                    PackageInstaller.initialize(getActivity()).wget("http://tinyurl.com/" + tag);
+                                    Toast.makeText(getActivity(), R.string.starting_download, Toast.LENGTH_SHORT).show();
+                                })
+                                .positiveText(R.string.Download)
+                                .show();
+                    }
+            ));
+        }
         optionsRowAdapter.add(new SettingOption(
                 getResources().getDrawable(R.drawable.app_icon_quantum),
-                "Install through tag",
-                () -> {
-                    new MaterialDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
-                            .title("#SIDELOADTAG")
-                            .customView(R.layout.dialog_sideload_tag, false)
-                            .onPositive((dialog, which) -> {
-                                String tag = ((EditText) dialog.getCustomView().findViewById(R.id.tag)).getText().toString();
-                                PackageInstaller.initialize(getActivity()).wget("http://tinyurl.com/" + tag);
-                                Toast.makeText(getActivity(), "Starting download...", Toast.LENGTH_SHORT).show();
-                            })
-                            .positiveText("Download")
-                            .show();
-                }
-        ));
-        optionsRowAdapter.add(new SettingOption(
-                getResources().getDrawable(R.drawable.app_icon_quantum),
-                "Credits",
+                getString(R.string.credits),
                 () -> {
                     new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
-                            .setTitle("Credits")
-                            .setMessage("Built by ITV Lab.\n\nUses open source code from #SIDELOADTAG")
+                            .setTitle(R.string.credits)
+                            .setMessage(R.string.about_app)
                             .show();
                 }
         ));
-        header = new HeaderItem(1, "More");
+        header = new HeaderItem(2, getString(R.string.header_more));
         mRowsAdapter.add(new ListRow(header, optionsRowAdapter));
 
         setAdapter(mRowsAdapter);
@@ -263,6 +294,8 @@ public class MainFragment extends BrowseFragment {
                 getActivity().startActivity(intent, bundle);
             } else if (item instanceof SettingOption) {
                 ((SettingOption) item).getClickListener().onClick();
+            } else if (item instanceof File) {
+                mPackageInstaller.install((File) item);
             }
         }
     }

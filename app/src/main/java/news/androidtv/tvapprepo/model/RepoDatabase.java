@@ -135,7 +135,36 @@ public class RepoDatabase {
         });
     }
 
+    public static void getLeanbackShortcut(String packageName, LeanbackShortcutCallback callback) {
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference reference = database.getReference("leanbackShortcuts");
+        DatabaseReference shortcutReference = reference.child(packageName.replaceAll("[.]", "_"));
+        if (shortcutReference == null) {
+            callback.onNoLeanbackShortcut();
+        } else {
+            shortcutReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    LeanbackShortcut leanbackShortcut =
+                            dataSnapshot.getValue(LeanbackShortcut.class);
+                    callback.onLeanbackShortcut(leanbackShortcut);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    callback.onDatabaseError(databaseError);
+                }
+            });
+        }
+    }
+
     public interface Listener {
         void onApkAdded(Apk apk, int index);
+    }
+
+    public interface LeanbackShortcutCallback {
+        void onNoLeanbackShortcut();
+        void onLeanbackShortcut(LeanbackShortcut leanbackShortcut);
+        void onDatabaseError(DatabaseError error);
     }
 }

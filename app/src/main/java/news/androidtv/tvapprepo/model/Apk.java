@@ -13,8 +13,6 @@ public class Apk {
     private String banner;
     private String downloadUrl;
     private String icon;
-    private boolean isLeanback;
-    private String leanbackShortcut;
     private String name;
     private String packageName;
     private long submitted;
@@ -37,14 +35,6 @@ public class Apk {
 
     public String getIcon() {
         return icon;
-    }
-
-    public boolean hasLeanback() {
-        return isLeanback;
-    }
-
-    public String getLeanbackShortcut() {
-        return leanbackShortcut;
     }
 
     public String getName() {
@@ -83,10 +73,6 @@ public class Apk {
         this.key = key;
     }
 
-    public void setIsLeanback(Boolean leanback) {
-        isLeanback = leanback;
-    }
-
     public void setSubmitted(long submitted) {
         this.submitted = submitted;
     }
@@ -97,9 +83,7 @@ public class Apk {
             jsonObject.put("name", name);
             jsonObject.put("banner", banner);
             jsonObject.put("icon", icon);
-            jsonObject.put("isLeanback", isLeanback);
             jsonObject.put("downloadUrl", downloadUrl);
-            jsonObject.put("leanbackShortcut", leanbackShortcut);
             jsonObject.put("packageName", packageName);
             jsonObject.put("submissionDate", submitted);
             jsonObject.put("versionCode", versionCode);
@@ -127,11 +111,7 @@ public class Apk {
                 mApk.name = jsonObject.getString("name");
                 mApk.banner = jsonObject.getString("banner");
                 mApk.icon = jsonObject.getString("icon");
-                mApk.isLeanback = jsonObject.getBoolean("isLeanback");
                 mApk.downloadUrl = jsonObject.getString("downloadUrl");
-                if (jsonObject.has("leanbackShortcut")) {
-                    mApk.leanbackShortcut = jsonObject.getString("leanbackShortcut");
-                }
                 mApk.packageName = jsonObject.getString("packageName");
                 mApk.submitted = jsonObject.getLong("submissionDate");
                 mApk.versionCode = jsonObject.getInt("versionCode");

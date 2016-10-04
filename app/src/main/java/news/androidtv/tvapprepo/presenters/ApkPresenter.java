@@ -78,7 +78,7 @@ public class ApkPresenter extends Presenter {
         Log.d(TAG, "onBindViewHolder");
         if (application.getBanner() != null) {
             cardView.setTitleText(application.getName());
-            cardView.setContentText(application.getVersionName() + "\n" + application.hasLeanback());
+            cardView.setContentText("Version " + application.getVersionName());
             cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT);
             Glide.with(viewHolder.view.getContext())
                     .load(application.getBanner())
