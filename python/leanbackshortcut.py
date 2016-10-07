@@ -5,6 +5,7 @@ import os
 import shutil
 import sys
 import urllib
+from firebase import firebase
 # Get all of the new apks from firebase
 # Run through them all
 # Upload to server
@@ -129,8 +130,25 @@ def replace(file_path, pattern, subst):
     shutil.move(abs_path, file_path)
     
 # MAIN EXECUTION
-if len(sys.argv) > 0 and (sys.argv[1] == '--debug' or sys.argv[1] == '-d'):
-    generate_apk("Cumulus TV", "com.felkertech.n.cumulustv", "https://github.com/Fleker/CumulusTV/blob/master/app/src/main/res/drawable-xhdpi/c_banner_3_2.jpg?raw=true")
-else:
-    # Run through Firebase
-    print "Getting latest apps from Firebase"
+if __name__ == '__main__':
+    if len(sys.argv) > 0 and (sys.argv[1] == '--debug' or sys.argv[1] == '-d'):
+        generate_apk("Cumulus TV", "com.felkertech.n.cumulustv", "https://github.com/Fleker/CumulusTV/blob/master/app/src/main/res/drawable-xhdpi/c_banner_3_2.jpg?raw=true")
+    elif len(sys.argv) > 0 and (sys.argv[1] == "--firebase"):
+        # Run through Firebase
+        print "Getting latest apps from Firebase"
+        firebase = firebase.FirebaseApplication('https://tv-app-repo.firebaseio.com', None)
+        result = firebase.get('/needShortcuts', None)
+        for app in result:
+            print "Generating " + result[app]['title']
+            print "  * Package Name: " + app.replace('_', '.')
+            print "  * Banner Url:   " + result[app]['banner']
+            # Validate package name
+            if len(app.replace('_', '.').strip()) <= 0:
+                print "This app has no package name!"
+                break;
+            if len(result[app]['banner'].strip()) <= 0:
+                print "This app has no banner!"
+                break;            
+            generate_apk(result[app]['title'], app.replace('_', '.'), result[app]['banner'])
+    else:
+        print "Unsupported action"
