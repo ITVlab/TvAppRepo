@@ -9,6 +9,8 @@
 /python/temp_apk
 /python/*.log
 /python/leanback_shortcuts
+/python/to_generate.json
+/python/leanbackshortcut.pyc
 # Built application files
 
 *.apk
