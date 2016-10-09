@@ -15,6 +15,7 @@
 package news.androidtv.tvapprepo.fragments;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -128,12 +129,25 @@ public class MainFragment extends BrowseFragment {
             Log.d(TAG, "onDestroy: " + mBackgroundTimer.toString());
             mBackgroundTimer.cancel();
         }
+        mPackageInstaller.removeListener(mDownloadListener);
     }
 
     @Override
     public void onResume() {
         super.onResume();
         loadRows();
+    }
+
+    private List<File> getApkDownloads(List<File> files, File[] startingPoint) {
+        // Recursively searches for APKs in your Downloads
+        for (File file : startingPoint) {
+            if (file.isDirectory()) {
+                files = getApkDownloads(files, file.listFiles());
+            } else if (file.getName().endsWith(".apk")) {
+                files.add(file);
+            }
+        }
+        return files;
     }
 
     private void loadRows() {
@@ -173,14 +187,17 @@ public class MainFragment extends BrowseFragment {
                     Environment.DIRECTORY_DOWNLOADS);
             // Add them to a list first before we sort them.
             List<File> downloadedFilesList = new ArrayList<>();
-            for (File download : myDownloads.listFiles()) {
-                if (download.getName().endsWith(".apk")) {
-                    // Is an APK!
-                    downloadedFilesList.add(download);
+/*            for (File download : myDownloads.listFiles()) {
+                try {
+                    Log.d(TAG, download.getName() + " " + download.getCanonicalPath());
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            }
+            }*/
 
-            // Now sort
+            downloadedFilesList = getApkDownloads(downloadedFilesList, myDownloads.listFiles());
+
+                    // Now sort
             Collections.sort(downloadedFilesList, (o1, o2) ->
                     (int) (o2.lastModified() - o1.lastModified()));
             downloadedFilesAdapter.addAll(0, downloadedFilesList);

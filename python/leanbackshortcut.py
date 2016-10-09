@@ -72,7 +72,7 @@ def upload_apk(packageName):
     if not os.path.exists('./leanback_shortcuts'):
         os.makedirs('./leanback_shortcuts')
         
-    shutil.move('./temp_apk/app/build/outputs/apk/app-release.apk', './leanback_shortcuts/' + packageName + '.apk')
+    shutil.move('./temp_apk/app/build/outputs/apk/app-release.apk', './leanback_shortcuts/shortcut_' + packageName + '.apk')
     print 'Moved to leanback_shortcuts/' + packageName + '.apk'
     # Upload to Firebase
     print 'Apk uploaded successfully'
@@ -107,7 +107,7 @@ def generate_apk(appName, packageName, banner):
     print 'Replaced strings'
     # Download banner to ./temp_apk/app/src/main/res/drawable
     # FIXME Make sure this is a png, issue an error if not
-    urllib.urlretrieve(banner, './temp_apk/app/src/main/res/drawable/tv_banner.jpg')    
+    urllib.urlretrieve(banner, './temp_apk/app/src/main/res/drawable/tv_banner.png')    
     # Compile
     print 'Compiling app ' + packageName;
     compile_app(packageName)
@@ -132,7 +132,7 @@ def replace(file_path, pattern, subst):
 # MAIN EXECUTION
 if __name__ == '__main__':
     if len(sys.argv) > 0 and (sys.argv[1] == '--debug' or sys.argv[1] == '-d'):
-        generate_apk("Cumulus TV", "com.felkertech.n.cumulustv", "https://github.com/Fleker/CumulusTV/blob/master/app/src/main/res/drawable-xhdpi/c_banner_3_2.jpg?raw=true")
+        generate_apk("Cumulus TV", "com.felkertech.n.cumulustv", "https://github.com/ITVlab/TvAppRepo/blob/python/promo/sample_banners/chrome.png?raw=true")
     elif len(sys.argv) > 0 and (sys.argv[1] == "--firebase"):
         # Run through Firebase
         print "Getting latest apps from Firebase"
