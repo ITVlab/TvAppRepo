@@ -32,7 +32,7 @@ public class PackageInstallerUtils {
     }
 
     // http://stackoverflow.com/questions/6813322/install-uninstall-apks-programmatically-packagemanager-vs-intents
-    public static void uninstallApp(Activity activity, String packageName){
+    public static void uninstallApp(Activity activity, String packageName) {
         Intent intent = new Intent(Intent.ACTION_DELETE, Uri.fromParts("package",
                 activity.getPackageManager().getPackageArchiveInfo(packageName, 0).packageName,
                 null));

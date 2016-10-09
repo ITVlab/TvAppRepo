@@ -85,6 +85,36 @@ public class VideoDetailsFragment extends DetailsFragment {
     private Drawable mDefaultBackground;
     private DisplayMetrics mMetrics;
     private PackageInstaller mPackageInstaller;
+    private PackageInstaller.DownloadListener mDownloadListener = new PackageInstaller.DownloadListener() {
+        @Override
+        public void onApkDownloaded(File downloadedApkFile) {
+            Log.d(TAG, "Downloaded " + downloadedApkFile.getAbsolutePath());
+            mPackageInstaller.install(downloadedApkFile);
+        }
+
+        @Override
+        public void onApkDownloadedNougat(final File downloadedApkFile) {
+            Log.d(TAG, "Downloaded " + downloadedApkFile.getAbsolutePath());
+            new Handler(Looper.getMainLooper()).postDelayed(
+                    () -> mPackageInstaller.install(downloadedApkFile), 1000 * 5);
+        }
+
+        @Override
+        public void onFileDeleted(File deletedApkFile, boolean wasSuccessful) {
+
+        }
+
+        @Override
+        public void onProgressStarted() {
+            // Show a video ad
+            Toast.makeText(getActivity(), "Download Started...", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onProgressEnded() {
+
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -104,6 +134,8 @@ public class VideoDetailsFragment extends DetailsFragment {
             setOnItemViewClickedListener(new ItemViewClickedListener());
             mPackageInstaller = PackageInstaller.initialize(getActivity());
             RepoDatabase.getInstance().incrementApkViews(mSelectedApk);
+
+            mPackageInstaller.addListener(mDownloadListener);
         } else {
             Intent intent = new Intent(getActivity(), MainActivity.class);
             startActivity(intent);
@@ -115,6 +147,7 @@ public class VideoDetailsFragment extends DetailsFragment {
     public void onStop() {
         super.onStop();
         mPackageInstaller.destroy();
+        mPackageInstaller.removeListener(mDownloadListener);
     }
 
     private void prepareBackgroundManager() {
