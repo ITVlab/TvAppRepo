@@ -161,16 +161,16 @@ public class MainFragment extends BrowseFragment {
         ApkPresenter cardPresenter = new ApkPresenter();
         final ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
         listRowAdapter.addAll(0, RepoDatabase.getInstance(RepoDatabase.DATABASE_TYPE_TESTING).getAppList());
-        RepoDatabase.getInstance(RepoDatabase.DATABASE_TYPE_TESTING).addListener((apk, index) -> {
+        for (Apk apk : RepoDatabase.getInstance(RepoDatabase.DATABASE_TYPE_TESTING).getAppList()) {
+            Log.d(TAG, apk.getPackageName() + " " + Utils.class.getPackage().getName());
             if (apk.getPackageName().equals(Utils.class.getPackage().getName())) {
-                if (PackageInstallerUtils.isUpdateAvailable(getActivity(), apk)) {
-                    new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
-                            .setTitle(R.string.update_for_tv_app_repo)
-                            .setPositiveButton(R.string.update, (dialog, which) ->
-                                mPackageInstaller.wget(apk.getDownloadUrl())
-                            )
-                            .show();
-                }
+                checkForAppUpdates(apk);
+            }
+        }
+        RepoDatabase.getInstance(RepoDatabase.DATABASE_TYPE_TESTING).addListener((apk, index) -> {
+            Log.d(TAG, apk.getPackageName() + " " + Utils.class.getPackage().getName());
+            if (apk.getPackageName().equals(Utils.class.getPackage().getName())) {
+                checkForAppUpdates(apk);
             } else {
                 listRowAdapter.add(apk);
                 listRowAdapter.notifyArrayItemRangeChanged(index, 1);
@@ -297,6 +297,17 @@ public class MainFragment extends BrowseFragment {
         }
         mBackgroundTimer = new Timer();
         mBackgroundTimer.schedule(new UpdateBackgroundTask(), BACKGROUND_UPDATE_DELAY);
+    }
+
+    private void checkForAppUpdates(Apk apk) {
+        if (PackageInstallerUtils.isUpdateAvailable(getActivity(), apk)) {
+            new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
+                    .setTitle(R.string.update_for_tv_app_repo)
+                    .setPositiveButton(R.string.update, (dialog, which) ->
+                            mPackageInstaller.wget(apk.getDefaultDownloadUrl())
+                    )
+                    .show();
+        }
     }
 
     private final class ItemViewClickedListener implements OnItemViewClickedListener {
