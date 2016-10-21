@@ -160,14 +160,14 @@ public class MainFragment extends BrowseFragment {
         // Add a presenter for APKs
         ApkPresenter cardPresenter = new ApkPresenter();
         final ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
-        listRowAdapter.addAll(0, RepoDatabase.getInstance(RepoDatabase.DATABASE_TYPE_TESTING).getAppList());
-        for (Apk apk : RepoDatabase.getInstance(RepoDatabase.DATABASE_TYPE_TESTING).getAppList()) {
+        listRowAdapter.addAll(0, RepoDatabase.getInstance().getAppList());
+        for (Apk apk : RepoDatabase.getInstance().getAppList()) {
             Log.d(TAG, apk.getPackageName() + " " + Utils.class.getPackage().getName());
             if (apk.getPackageName().equals(Utils.class.getPackage().getName())) {
                 checkForAppUpdates(apk);
             }
         }
-        RepoDatabase.getInstance(RepoDatabase.DATABASE_TYPE_TESTING).addListener((apk, index) -> {
+        RepoDatabase.getInstance().addListener((apk, index) -> {
             Log.d(TAG, apk.getPackageName() + " " + Utils.class.getPackage().getName());
             if (apk.getPackageName().equals(Utils.class.getPackage().getName())) {
                 checkForAppUpdates(apk);
@@ -210,7 +210,7 @@ public class MainFragment extends BrowseFragment {
         ArrayObjectAdapter optionsRowAdapter = new ArrayObjectAdapter(optionsCardPresenter);
         if (getResources().getBoolean(R.bool.ENABLE_SIDELOADTAG)) {
             optionsRowAdapter.add(new SettingOption(
-                    getResources().getDrawable(R.drawable.app_icon_quantum),
+                    getResources().getDrawable(R.drawable.sideloadtag),
                     getString(R.string.install_through_sideloadtag),
                     () -> {
                         new MaterialDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
@@ -227,7 +227,7 @@ public class MainFragment extends BrowseFragment {
             ));
         }
         optionsRowAdapter.add(new SettingOption(
-                getResources().getDrawable(R.drawable.app_icon_quantum),
+                getResources().getDrawable(R.drawable.about_credits),
                 getString(R.string.credits),
                 () -> {
                     new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
