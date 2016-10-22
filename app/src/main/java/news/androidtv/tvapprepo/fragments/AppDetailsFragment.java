@@ -58,6 +58,7 @@ import news.androidtv.tvapprepo.R;
 import news.androidtv.tvapprepo.Utils;
 import news.androidtv.tvapprepo.activities.DetailsActivity;
 import news.androidtv.tvapprepo.activities.MainActivity;
+import news.androidtv.tvapprepo.download.ApkDownloadHelper;
 import news.androidtv.tvapprepo.model.Apk;
 import news.androidtv.tvapprepo.model.LeanbackShortcut;
 import news.androidtv.tvapprepo.model.RepoDatabase;
@@ -87,19 +88,19 @@ public class AppDetailsFragment extends DetailsFragment {
     private BackgroundManager mBackgroundManager;
     private Drawable mDefaultBackground;
     private DisplayMetrics mMetrics;
-    private PackageInstaller mPackageInstaller;
+    private ApkDownloadHelper mApkDownloadHelper;
     private PackageInstaller.DownloadListener mDownloadListener = new PackageInstaller.DownloadListener() {
         @Override
         public void onApkDownloaded(File downloadedApkFile) {
             Log.d(TAG, "Downloaded " + downloadedApkFile.getAbsolutePath());
-            mPackageInstaller.install(downloadedApkFile);
+            mApkDownloadHelper.install(downloadedApkFile);
         }
 
         @Override
         public void onApkDownloadedNougat(final File downloadedApkFile) {
             Log.d(TAG, "Downloaded " + downloadedApkFile.getAbsolutePath());
             new Handler(Looper.getMainLooper()).postDelayed(
-                    () -> mPackageInstaller.install(downloadedApkFile), 1000 * 5);
+                    () -> mApkDownloadHelper.install(downloadedApkFile), 1000 * 5);
         }
 
         @Override
@@ -135,10 +136,10 @@ public class AppDetailsFragment extends DetailsFragment {
             setupMovieListRowPresenter();
             updateBackground(mSelectedApk.getBanner());
             setOnItemViewClickedListener(new ItemViewClickedListener());
-            mPackageInstaller = PackageInstaller.initialize(getActivity());
+            mApkDownloadHelper = new ApkDownloadHelper(getActivity());
             RepoDatabase.getInstance().incrementApkViews(mSelectedApk);
 
-            mPackageInstaller.addListener(mDownloadListener);
+            mApkDownloadHelper.addListener(mDownloadListener);
         } else {
             Intent intent = new Intent(getActivity(), MainActivity.class);
             startActivity(intent);
@@ -149,8 +150,9 @@ public class AppDetailsFragment extends DetailsFragment {
     @Override
     public void onStop() {
         super.onStop();
-        mPackageInstaller.destroy();
-        mPackageInstaller.removeListener(mDownloadListener);
+        Log.d(TAG, "App activity stopped");
+        mApkDownloadHelper.destroy();
+        mApkDownloadHelper.removeListener(mDownloadListener);
     }
 
     private void prepareBackgroundManager() {
@@ -291,7 +293,7 @@ public class AppDetailsFragment extends DetailsFragment {
 
     public void download(String url) {
         RepoDatabase.getInstance().incrementApkDownloads(mSelectedApk);
-        mPackageInstaller.wget(url);
+        mApkDownloadHelper.startDownload(url);
         RepoDatabase.getLeanbackShortcut(mSelectedApk.getPackageName(),
             new RepoDatabase.LeanbackShortcutCallback() {
                 @Override
@@ -301,7 +303,7 @@ public class AppDetailsFragment extends DetailsFragment {
 
                 @Override
                 public void onLeanbackShortcut(LeanbackShortcut leanbackShortcut) {
-                    mPackageInstaller.wget(leanbackShortcut.getDownload());
+                    mApkDownloadHelper.startDownload(leanbackShortcut.getDownload());
                 }
 
                 @Override
