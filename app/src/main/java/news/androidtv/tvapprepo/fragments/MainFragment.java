@@ -15,7 +15,6 @@
 package news.androidtv.tvapprepo.fragments;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,6 +57,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import news.androidtv.tvapprepo.R;
 import news.androidtv.tvapprepo.Utils;
 import news.androidtv.tvapprepo.activities.DetailsActivity;
+import news.androidtv.tvapprepo.download.ApkDownloadHelper;
 import news.androidtv.tvapprepo.model.Apk;
 import news.androidtv.tvapprepo.model.RepoDatabase;
 import news.androidtv.tvapprepo.model.SettingOption;
@@ -83,17 +83,17 @@ public class MainFragment extends BrowseFragment {
     private Timer mBackgroundTimer;
     private URI mBackgroundURI;
     private BackgroundManager mBackgroundManager;
-    private PackageInstaller mPackageInstaller;
+    private ApkDownloadHelper mApkDownloadHelper;
     private PackageInstaller.DownloadListener mDownloadListener = new PackageInstaller.DownloadListener() {
         @Override
         public void onApkDownloaded(File downloadedApkFile) {
-            mPackageInstaller.install(downloadedApkFile);
+            mApkDownloadHelper.install(downloadedApkFile);
         }
 
         @Override
         public void onApkDownloadedNougat(final File downloadedApkFile) {
             new Handler(Looper.getMainLooper()).postDelayed(
-                    () -> mPackageInstaller.install(downloadedApkFile), 1000 * 5);
+                    () -> mApkDownloadHelper.install(downloadedApkFile), 1000 * 1);
         }
 
         @Override
@@ -129,7 +129,7 @@ public class MainFragment extends BrowseFragment {
             Log.d(TAG, "onDestroy: " + mBackgroundTimer.toString());
             mBackgroundTimer.cancel();
         }
-        mPackageInstaller.removeListener(mDownloadListener);
+        mApkDownloadHelper.removeListener(mDownloadListener);
     }
 
     @Override
@@ -153,21 +153,21 @@ public class MainFragment extends BrowseFragment {
     private void loadRows() {
         mRowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
 
-        mPackageInstaller = PackageInstaller.initialize(getActivity());
+        mApkDownloadHelper = new ApkDownloadHelper(getActivity());
         // Setup the package installer for the session
-        mPackageInstaller.addListener(mDownloadListener);
+        mApkDownloadHelper.addListener(mDownloadListener);
 
         // Add a presenter for APKs
         ApkPresenter cardPresenter = new ApkPresenter();
         final ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
-        listRowAdapter.addAll(0, RepoDatabase.getInstance(RepoDatabase.DATABASE_TYPE_TESTING).getAppList());
-        for (Apk apk : RepoDatabase.getInstance(RepoDatabase.DATABASE_TYPE_TESTING).getAppList()) {
+        listRowAdapter.addAll(0, RepoDatabase.getInstance().getAppList());
+        for (Apk apk : RepoDatabase.getInstance().getAppList()) {
             Log.d(TAG, apk.getPackageName() + " " + Utils.class.getPackage().getName());
             if (apk.getPackageName().equals(Utils.class.getPackage().getName())) {
                 checkForAppUpdates(apk);
             }
         }
-        RepoDatabase.getInstance(RepoDatabase.DATABASE_TYPE_TESTING).addListener((apk, index) -> {
+        RepoDatabase.getInstance().addListener((apk, index) -> {
             Log.d(TAG, apk.getPackageName() + " " + Utils.class.getPackage().getName());
             if (apk.getPackageName().equals(Utils.class.getPackage().getName())) {
                 checkForAppUpdates(apk);
@@ -210,7 +210,7 @@ public class MainFragment extends BrowseFragment {
         ArrayObjectAdapter optionsRowAdapter = new ArrayObjectAdapter(optionsCardPresenter);
         if (getResources().getBoolean(R.bool.ENABLE_SIDELOADTAG)) {
             optionsRowAdapter.add(new SettingOption(
-                    getResources().getDrawable(R.drawable.app_icon_quantum),
+                    getResources().getDrawable(R.drawable.sideloadtag),
                     getString(R.string.install_through_sideloadtag),
                     () -> {
                         new MaterialDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
@@ -227,7 +227,7 @@ public class MainFragment extends BrowseFragment {
             ));
         }
         optionsRowAdapter.add(new SettingOption(
-                getResources().getDrawable(R.drawable.app_icon_quantum),
+                getResources().getDrawable(R.drawable.about_credits),
                 getString(R.string.credits),
                 () -> {
                     new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
@@ -304,7 +304,7 @@ public class MainFragment extends BrowseFragment {
             new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
                     .setTitle(R.string.update_for_tv_app_repo)
                     .setPositiveButton(R.string.update, (dialog, which) ->
-                            mPackageInstaller.wget(apk.getDefaultDownloadUrl())
+                            mApkDownloadHelper.startDownload(apk.getDefaultDownloadUrl())
                     )
                     .show();
         }
@@ -329,7 +329,7 @@ public class MainFragment extends BrowseFragment {
             } else if (item instanceof SettingOption) {
                 ((SettingOption) item).getClickListener().onClick();
             } else if (item instanceof File) {
-                mPackageInstaller.install((File) item);
+                mApkDownloadHelper.install((File) item);
             }
         }
     }

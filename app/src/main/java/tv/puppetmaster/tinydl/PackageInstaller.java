@@ -31,9 +31,9 @@ import news.androidtv.tvapprepo.R;
 
 /**
  * <p>A utility class for installing packages. It is a singleton and must be
- * instantiated with the {@link initialize(Activity)} call. To add a callback,
+ * instantiated with the {@link #initialize(Activity)} call. To add a callback,
  * which would be run during the lifecycle of a download, use the
- * {@link addListener(DownloadListener)} method. Multiple listeners can be added.
+ * {@link #addListener(DownloadListener)} method. Multiple listeners can be added.
  * </p>
  *
  * <p>This class uses a {@link BroadcastReceiver} to listen to changes in the

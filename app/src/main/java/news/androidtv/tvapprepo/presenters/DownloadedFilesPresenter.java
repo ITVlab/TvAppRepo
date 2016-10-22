@@ -37,7 +37,7 @@ public class DownloadedFilesPresenter extends CardPresenter {
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object item) {
         final File downloadedApk = (File) item;
         final ImageCardView cardView = (ImageCardView) viewHolder.view;
-        cardView.setMainImage(contextThemeWrapper.getDrawable(R.drawable.app_icon_quantum_card));
+        cardView.setMainImage(contextThemeWrapper.getDrawable(R.drawable.download));
         cardView.setTitleText(downloadedApk.getName());
         cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT);
         cardView.getMainImageView().setScaleType(ImageView.ScaleType.FIT_CENTER);
