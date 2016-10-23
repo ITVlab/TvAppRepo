@@ -76,6 +76,7 @@ public class MainFragment extends BrowseFragment {
     private static final int NUM_ROWS = 6;
     private static final int NUM_COLS = 15;
 
+    private boolean checkedForUpdates = true;
     private final Handler mHandler = new Handler();
     private ArrayObjectAdapter mRowsAdapter;
     private Drawable mDefaultBackground;
@@ -93,7 +94,7 @@ public class MainFragment extends BrowseFragment {
         @Override
         public void onApkDownloadedNougat(final File downloadedApkFile) {
             new Handler(Looper.getMainLooper()).postDelayed(
-                    () -> mApkDownloadHelper.install(downloadedApkFile), 1000 * 1);
+                    () -> mApkDownloadHelper.install(downloadedApkFile), 1000 * 5);
         }
 
         @Override
@@ -300,7 +301,12 @@ public class MainFragment extends BrowseFragment {
     }
 
     private void checkForAppUpdates(Apk apk) {
+        // Only tell the user once per session
+        if (checkedForUpdates) {
+            return;
+        }
         if (PackageInstallerUtils.isUpdateAvailable(getActivity(), apk)) {
+            checkedForUpdates = true;
             new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
                     .setTitle(R.string.update_for_tv_app_repo)
                     .setPositiveButton(R.string.update, (dialog, which) ->
@@ -348,12 +354,9 @@ public class MainFragment extends BrowseFragment {
     private class UpdateBackgroundTask extends TimerTask {
         @Override
         public void run() {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (mBackgroundURI != null) {
-                        updateBackground(mBackgroundURI.toString());
-                    }
+            mHandler.post(() -> {
+                if (mBackgroundURI != null) {
+                    updateBackground(mBackgroundURI.toString());
                 }
             });
         }
