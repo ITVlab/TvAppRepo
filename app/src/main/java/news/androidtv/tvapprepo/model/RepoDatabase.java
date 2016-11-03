@@ -42,7 +42,7 @@ public class RepoDatabase {
     }
 
     public static RepoDatabase getInstance() {
-        return getInstance(DATABASE_TYPE_TESTING);
+        return getInstance(DATABASE_TYPE_PROD);
     }
 
     public static RepoDatabase getInstance(String type) {

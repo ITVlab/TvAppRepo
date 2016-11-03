@@ -11,7 +11,7 @@ import com.colortv.android.ColorTvSdk;
  * Created by Nick on 9/23/2016.
  */
 public abstract class AbstractDownloadHelper {
-    private static final double AD_RATE = 1/1;
+    private static final double AD_RATE = 1/4;
     private static final boolean mDisableAds = false;
 
     private Activity mActivity;
