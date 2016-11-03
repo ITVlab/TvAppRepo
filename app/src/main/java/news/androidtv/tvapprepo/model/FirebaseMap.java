@@ -3,7 +3,7 @@ package news.androidtv.tvapprepo.model;
 import java.util.HashMap;
 
 /**
- * Firebase uses a unique serialization scheme for maps in Android, and it's not a standard
+ * HashMap uses a unique serialization scheme, and it's not a standard
  * {@link org.json.JSONObject}. This class converts between this serialization and a map.
  */
 public class FirebaseMap {
@@ -24,14 +24,14 @@ public class FirebaseMap {
             index = temp.indexOf("=");
             String key = temp.substring(0, index).trim();
             temp = temp.substring(index + 1);
-            index = temp.indexOf("',");
+            index = temp.indexOf(",");
             if (index == -1) {
                 String value = temp.substring(0, temp.length() - 2).trim();
                 mMap.put(key, value);
             } else {
                 String value = temp.substring(0, index).trim();
                 mMap.put(key, value);
-                temp = temp.substring(index + 2).trim();
+                temp = temp.substring(index + 1).trim();
             }
         }
     }

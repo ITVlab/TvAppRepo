@@ -16,10 +16,14 @@ package news.androidtv.tvapprepo.activities;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.media.MediaMetadataCompat;
 
+import com.colortv.android.ColorTvSdk;
 import com.crashlytics.android.Crashlytics;
 
 import io.fabric.sdk.android.Fabric;
+import io.fabric.sdk.android.services.concurrency.DependsOn;
+import news.androidtv.tvapprepo.PrivateUtils;
 import news.androidtv.tvapprepo.R;
 
 /*
@@ -34,9 +38,10 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Fabric.with(this, new Crashlytics());
-        checkSelfVersion();
+//        checkSelfVersion();
     }
 
+    @Deprecated
     public void checkSelfVersion() {
         // Make a call to Firebase
     }

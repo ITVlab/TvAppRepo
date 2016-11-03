@@ -141,6 +141,10 @@ public class MainFragment extends BrowseFragment {
 
     private List<File> getApkDownloads(List<File> files, File[] startingPoint) {
         // Recursively searches for APKs in your Downloads
+        if (startingPoint == null) {
+            // Either we don't have permission or otherwise can't obtain files
+            return new ArrayList<>(); // Return empty list
+        }
         for (File file : startingPoint) {
             if (file.isDirectory()) {
                 files = getApkDownloads(files, file.listFiles());
