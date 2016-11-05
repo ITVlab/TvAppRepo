@@ -84,6 +84,7 @@ public class PackageInstaller {
                     } else if (uriString != null) {
                         File fileToDelete = new File(Uri.parse(uriString).getPath());
                         boolean success = fileToDelete.delete();
+                        Log.i(TAG, "Deletion file. Successful? " + success);
                         Toast.makeText(ctxt, ctxt.getString(R.string.warning_invalid_tag) + ": " +
                                 (success ? "Removed" : "Unremoved"), Toast.LENGTH_LONG).show();
                         for (DownloadListener callback : callbackList) {
@@ -93,6 +94,7 @@ public class PackageInstaller {
                     }
                 } else {
                     int reason = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_REASON));
+                    Log.e(TAG, "Error getting APK: " + reason);
                     Toast.makeText(ctxt, ctxt.getString(R.string.warning_invalid_tag) + ": " +
                             reason, Toast.LENGTH_LONG).show();
                 }
