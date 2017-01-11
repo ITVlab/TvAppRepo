@@ -19,6 +19,14 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        playstore { // Build that removes apk repository
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        opencommunity { // Build that enables apk repository
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
     }
     compileOptions {
         targetCompatibility 1.8
@@ -32,7 +40,6 @@ buildscript {
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
-//        classpath 'com.android.tools.build:gradle:2.2.3'
         classpath 'io.fabric.tools:gradle:1.22.0'
     }
 }
@@ -47,13 +54,13 @@ repositories {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:recyclerview-v7:25.0.0'
-    compile 'com.android.support:leanback-v17:25.0.0'
-    compile 'com.android.support:appcompat-v7:25.0.0'
+    compile 'com.android.support:recyclerview-v7:25.1.0'
+    compile 'com.android.support:leanback-v17:25.1.0'
+    compile 'com.android.support:appcompat-v7:25.1.0'
 
-    compile 'com.google.firebase:firebase-database:9.6.1'
-    compile 'com.google.android.gms:play-services-ads:9.6.1'
-    compile 'com.google.firebase:firebase-config:9.6.1'
+    compile 'com.google.firebase:firebase-database:10.0.1'
+    compile 'com.google.android.gms:play-services-ads:10.0.1'
+    compile 'com.google.firebase:firebase-config:10.0.1'
 
     compile 'com.colortv:android-sdk:2.1.0'
     compile 'com.github.bumptech.glide:glide:3.4.0'

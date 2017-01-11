@@ -14,14 +14,6 @@
 
 package news.androidtv.tvapprepo.fragments;
 
-import java.io.File;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -53,6 +45,14 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+
+import java.io.File;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import news.androidtv.tvapprepo.R;
 import news.androidtv.tvapprepo.Utils;
@@ -161,28 +161,31 @@ public class MainFragment extends BrowseFragment {
         mApkDownloadHelper = new ApkDownloadHelper(getActivity());
         // Setup the package installer for the session
         mApkDownloadHelper.addListener(mDownloadListener);
+        HeaderItem header
 
-        // Add a presenter for APKs
-        ApkPresenter cardPresenter = new ApkPresenter();
-        final ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
-        listRowAdapter.addAll(0, RepoDatabase.getInstance().getAppList());
-        for (Apk apk : RepoDatabase.getInstance().getAppList()) {
-            Log.d(TAG, apk.getPackageName() + " " + Utils.class.getPackage().getName());
-            if (apk.getPackageName().equals(Utils.class.getPackage().getName())) {
-                checkForAppUpdates(apk);
+        if (getResources().getBoolean(R.bool.ENABLE_APP_REPO)) {
+            // Add a presenter for APKs - only if allowed
+            ApkPresenter cardPresenter = new ApkPresenter();
+            final ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
+            listRowAdapter.addAll(0, RepoDatabase.getInstance().getAppList());
+            for (Apk apk : RepoDatabase.getInstance().getAppList()) {
+                Log.d(TAG, apk.getPackageName() + " " + Utils.class.getPackage().getName());
+                if (apk.getPackageName().equals(Utils.class.getPackage().getName())) {
+                    checkForAppUpdates(apk);
+                }
             }
+            RepoDatabase.getInstance().addListener((apk, index) -> {
+                Log.d(TAG, apk.getPackageName() + " " + Utils.class.getPackage().getName());
+                if (apk.getPackageName().equals(Utils.class.getPackage().getName())) {
+                    checkForAppUpdates(apk);
+                } else {
+                    listRowAdapter.add(apk);
+                    listRowAdapter.notifyArrayItemRangeChanged(index, 1);
+                }
+            });
+            header = new HeaderItem(0, getString(R.string.header_browse));
+            mRowsAdapter.add(new ListRow(header, listRowAdapter));
         }
-        RepoDatabase.getInstance().addListener((apk, index) -> {
-            Log.d(TAG, apk.getPackageName() + " " + Utils.class.getPackage().getName());
-            if (apk.getPackageName().equals(Utils.class.getPackage().getName())) {
-                checkForAppUpdates(apk);
-            } else {
-                listRowAdapter.add(apk);
-                listRowAdapter.notifyArrayItemRangeChanged(index, 1);
-            }
-        });
-        HeaderItem header = new HeaderItem(0, getString(R.string.header_browse));
-        mRowsAdapter.add(new ListRow(header, listRowAdapter));
 
         if (getResources().getBoolean(R.bool.ENABLE_DOWNLOADS_ROW)) {
             // Add a row for downloaded APKs

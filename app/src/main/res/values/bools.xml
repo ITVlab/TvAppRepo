@@ -2,4 +2,5 @@
 <resources>
     <bool name="ENABLE_SIDELOADTAG">true</bool>
     <bool name="ENABLE_DOWNLOADS_ROW">true</bool>
+    <bool name="ENABLE_APP_REPO">false</bool>
 </resources>

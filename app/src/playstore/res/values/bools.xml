@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="ENABLE_APP_REPO">false</bool>
+</resources>
