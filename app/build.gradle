@@ -22,6 +22,8 @@ android {
         playstore { // Build that removes apk repository
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            applicationIdSuffix '.playstore'
+            versionNameSuffix '-playstore'
         }
         opencommunity { // Build that enables apk repository
             minifyEnabled true

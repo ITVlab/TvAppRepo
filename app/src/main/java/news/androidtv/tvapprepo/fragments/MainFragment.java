@@ -161,7 +161,7 @@ public class MainFragment extends BrowseFragment {
         mApkDownloadHelper = new ApkDownloadHelper(getActivity());
         // Setup the package installer for the session
         mApkDownloadHelper.addListener(mDownloadListener);
-        HeaderItem header
+        HeaderItem header = null;
 
         if (getResources().getBoolean(R.bool.ENABLE_APP_REPO)) {
             // Add a presenter for APKs - only if allowed
