@@ -105,12 +105,6 @@ public class ShortcutPostTask {
                                 "image/png"));
                 return params;
             }
-
-/*            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String,String> params = new HashMap<>();
-                return params;
-            }*/
         };
         try {
             Log.d(TAG, sr.getHeaders().toString());
@@ -127,12 +121,4 @@ public class ShortcutPostTask {
         void onResponse(NetworkResponse response);
         void onError(VolleyError error);
     }
-
-/*    public static class ShortcutDownloadTask extends AsyncTask<String, Void, File> {
-
-        @Override
-        protected File doInBackground(String... strings) {
-
-        }
-    }*/
 }
