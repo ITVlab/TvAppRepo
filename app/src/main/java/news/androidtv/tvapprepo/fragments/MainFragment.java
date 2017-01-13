@@ -261,8 +261,10 @@ public class MainFragment extends BrowseFragment {
             ResolveInfo info = infoIterator.next();
 
             // Filter out those where shortcuts already exist
+            String adjustedName = info.activityInfo.applicationInfo.loadLabel(getActivity().getPackageManager()).toString();
+            adjustedName = adjustedName.toLowerCase().trim();
             Intent shortcut = getActivity().getPackageManager().getLeanbackLaunchIntentForPackage(
-                    "de.eye_interactive.atvl." + info.activityInfo.applicationInfo.name
+                    "de.eye_interactive.atvl." + adjustedName
             );
             if (shortcut != null) {
                 infoIterator.remove();

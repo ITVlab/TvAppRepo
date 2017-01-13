@@ -237,6 +237,7 @@ public class PackageInstaller {
             if (downloadUri == null) {
                 return R.string.error_download_failed;
             }
+            // TODO Make more descriptive download names
             final String downloadedFileName =
                     urls[0].substring(urls[0].lastIndexOf("/") + 1).trim().replaceAll("\\?", "")
                             + ".apk";
