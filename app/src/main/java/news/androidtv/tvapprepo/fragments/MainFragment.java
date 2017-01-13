@@ -55,6 +55,7 @@ import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -220,8 +221,12 @@ public class MainFragment extends BrowseFragment {
             downloadedFilesList = getApkDownloads(downloadedFilesList, myDownloads.listFiles());
 
             // Now sort
-            Collections.sort(downloadedFilesList, (o1, o2) ->
-                    (int) (o2.lastModified() - o1.lastModified()));
+            Collections.sort(downloadedFilesList, new Comparator<File>() {
+                        @Override
+                        public int compare(File file, File t1) {
+                            return (int) (file.lastModified() - t1.lastModified());
+                        }
+                    });
             downloadedFilesAdapter.addAll(0, downloadedFilesList);
             HeaderItem downloadedFilesHeader = new HeaderItem(1, getString(R.string.header_downloaded_apks));
             mRowsAdapter.add(new ListRow(downloadedFilesHeader, downloadedFilesAdapter));
@@ -340,7 +345,7 @@ public class MainFragment extends BrowseFragment {
         mBackgroundTimer.schedule(new UpdateBackgroundTask(), BACKGROUND_UPDATE_DELAY);
     }
 
-    private void checkForAppUpdates(Apk apk) {
+    private void checkForAppUpdates(final Apk apk) {
         // Only tell the user once per session
         if (checkedForUpdates) {
             return;
@@ -352,9 +357,9 @@ public class MainFragment extends BrowseFragment {
                     .setPositiveButton(R.string.update, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            mApkDownloadHelper.startDownload(apk.getDefaultDownloadUrl())
+                            mApkDownloadHelper.startDownload(apk.getDefaultDownloadUrl());
                         }
-                    }
+                    })
                     .show();
         }
     }

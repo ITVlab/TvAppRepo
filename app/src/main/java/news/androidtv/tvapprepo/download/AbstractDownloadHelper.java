@@ -21,7 +21,7 @@ public abstract class AbstractDownloadHelper {
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
     private Activity mActivity;
 
-    private ColorTvAdListener mListener = new ColorTvAdListener() {
+    /*private ColorTvAdListener mListener = new ColorTvAdListener() {
         @Override
         public void onAdLoaded(String placement) {
             ColorTvSdk.showAd(placement);
@@ -38,7 +38,7 @@ public abstract class AbstractDownloadHelper {
         @Override
         public void onAdExpired(String placement) {
         }
-    };
+    };*/
 
     protected AbstractDownloadHelper() {
 
@@ -54,19 +54,19 @@ public abstract class AbstractDownloadHelper {
                 AD_RATE = mFirebaseRemoteConfig.getLong("ad_rate");
             }
         });
-        ColorTvSdk.init(activity, getAppId());
+/*        ColorTvSdk.init(activity, getAppId());
         ColorTvSdk.setRecordAudioEnabled(false);
         ColorTvSdk.onCreate();
-        ColorTvSdk.registerAdListener(mListener);
+        ColorTvSdk.registerAdListener(mListener);*/
         return this;
     }
 
     public void destroy() {
-        ColorTvSdk.onDestroy();
+//        ColorTvSdk.onDestroy();
     }
 
     public AbstractDownloadHelper startDownload(String url) {
-        startDownload(url, AdPlacement.BETWEEN_LEVELS);
+        startDownload(url, "");
         return this;
     }
 
@@ -74,7 +74,7 @@ public abstract class AbstractDownloadHelper {
         // Starts download
         // Also loads ad
         if (!mDisableAds && Math.random() < AD_RATE) {
-            ColorTvSdk.loadAd(adType);
+//            ColorTvSdk.loadAd(adType);
         }
         return this;
     }
