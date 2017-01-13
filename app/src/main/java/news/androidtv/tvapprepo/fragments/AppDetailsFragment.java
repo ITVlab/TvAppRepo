@@ -14,6 +14,7 @@
 
 package news.androidtv.tvapprepo.fragments;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -99,8 +100,12 @@ public class AppDetailsFragment extends DetailsFragment {
         @Override
         public void onApkDownloadedNougat(final File downloadedApkFile) {
             Log.d(TAG, "Downloaded " + downloadedApkFile.getAbsolutePath());
-            new Handler(Looper.getMainLooper()).postDelayed(
-                    () -> mApkDownloadHelper.install(downloadedApkFile), 1000 * 5);
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mApkDownloadHelper.install(downloadedApkFile);
+                }
+            }, 1000 * 5);
         }
 
         @Override
@@ -277,8 +282,11 @@ public class AppDetailsFragment extends DetailsFragment {
                         // Display picker
                         new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
                                 .setTitle("Download which APK variant?")
-                                .setItems(mSelectedApk.getDownloadTitleArray(), (dialog, which) -> {
-                                    download(mSelectedApk.getDownloadUrlArray()[which]);
+                                .setItems(mSelectedApk.getDownloadTitleArray(), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        download(mSelectedApk.getDownloadUrlArray()[i]);
+                                    }
                                 })
                                 .show();
                     } else {

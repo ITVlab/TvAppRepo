@@ -14,12 +14,16 @@
 
 package news.androidtv.tvapprepo.fragments;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.BrowseFragment;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
@@ -40,6 +44,7 @@ import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
@@ -63,12 +68,14 @@ import news.androidtv.tvapprepo.model.RepoDatabase;
 import news.androidtv.tvapprepo.model.SettingOption;
 import news.androidtv.tvapprepo.presenters.ApkPresenter;
 import news.androidtv.tvapprepo.presenters.DownloadedFilesPresenter;
+import news.androidtv.tvapprepo.presenters.LauncherActivitiesPresenter;
 import news.androidtv.tvapprepo.presenters.OptionsCardPresenter;
 import news.androidtv.tvapprepo.utils.PackageInstallerUtils;
 import tv.puppetmaster.tinydl.PackageInstaller;
 
 public class MainFragment extends BrowseFragment {
-    private static final String TAG = "MainFragment";
+    private static final String TAG = MainFragment.class.getSimpleName();
+    private static final boolean DEBUG_SHOW_APKS = false;
 
     private static final int BACKGROUND_UPDATE_DELAY = 300;
     private static final int GRID_ITEM_WIDTH = 200;
@@ -93,8 +100,12 @@ public class MainFragment extends BrowseFragment {
 
         @Override
         public void onApkDownloadedNougat(final File downloadedApkFile) {
-            new Handler(Looper.getMainLooper()).postDelayed(
-                    () -> mApkDownloadHelper.install(downloadedApkFile), 1000 * 5);
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mApkDownloadHelper.install(downloadedApkFile);
+                }
+            }, 1000 * 5);
         }
 
         @Override
@@ -163,7 +174,7 @@ public class MainFragment extends BrowseFragment {
         mApkDownloadHelper.addListener(mDownloadListener);
         HeaderItem header = null;
 
-        if (getResources().getBoolean(R.bool.ENABLE_APP_REPO)) {
+        if (getResources().getBoolean(R.bool.ENABLE_APP_REPO) && DEBUG_SHOW_APKS) {
             // Add a presenter for APKs - only if allowed
             ApkPresenter cardPresenter = new ApkPresenter();
             final ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
@@ -174,13 +185,16 @@ public class MainFragment extends BrowseFragment {
                     checkForAppUpdates(apk);
                 }
             }
-            RepoDatabase.getInstance().addListener((apk, index) -> {
-                Log.d(TAG, apk.getPackageName() + " " + Utils.class.getPackage().getName());
-                if (apk.getPackageName().equals(Utils.class.getPackage().getName())) {
-                    checkForAppUpdates(apk);
-                } else {
-                    listRowAdapter.add(apk);
-                    listRowAdapter.notifyArrayItemRangeChanged(index, 1);
+            RepoDatabase.getInstance().addListener(new RepoDatabase.Listener() {
+                @Override
+                public void onApkAdded(Apk apk, int index) {
+                    Log.d(TAG, apk.getPackageName() + " " + Utils.class.getPackage().getName());
+                    if (apk.getPackageName().equals(Utils.class.getPackage().getName())) {
+                        checkForAppUpdates(apk);
+                    } else {
+                        listRowAdapter.add(apk);
+                        listRowAdapter.notifyArrayItemRangeChanged(index, 1);
+                    }
                 }
             });
             header = new HeaderItem(0, getString(R.string.header_browse));
@@ -205,13 +219,23 @@ public class MainFragment extends BrowseFragment {
 
             downloadedFilesList = getApkDownloads(downloadedFilesList, myDownloads.listFiles());
 
-                    // Now sort
+            // Now sort
             Collections.sort(downloadedFilesList, (o1, o2) ->
                     (int) (o2.lastModified() - o1.lastModified()));
             downloadedFilesAdapter.addAll(0, downloadedFilesList);
             HeaderItem downloadedFilesHeader = new HeaderItem(1, getString(R.string.header_downloaded_apks));
             mRowsAdapter.add(new ListRow(downloadedFilesHeader, downloadedFilesAdapter));
         }
+
+        // Add a row for Leanback shortcuts
+        List<ResolveInfo> launcherActivities = getActivity().getPackageManager()
+                .queryIntentActivities(new Intent(Intent.CATEGORY_LAUNCHER), PackageManager.MATCH_ALL);
+        // TODO Filter out those where shortcuts already exist
+        LauncherActivitiesPresenter launcherActivitiesPresenter = new LauncherActivitiesPresenter();
+        ArrayObjectAdapter launcherActivitiesAdapter = new ArrayObjectAdapter(launcherActivitiesPresenter);
+        launcherActivitiesAdapter.addAll(0, launcherActivities);
+        HeaderItem launcherActivitiesHeader = new HeaderItem(2, "Need Shortcuts");
+        mRowsAdapter.add(new ListRow(launcherActivitiesHeader, launcherActivitiesAdapter));
 
         // Add a row for credits
         OptionsCardPresenter optionsCardPresenter = new OptionsCardPresenter();
@@ -220,28 +244,37 @@ public class MainFragment extends BrowseFragment {
             optionsRowAdapter.add(new SettingOption(
                     getResources().getDrawable(R.drawable.sideloadtag),
                     getString(R.string.install_through_sideloadtag),
-                    () -> {
-                        new MaterialDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
-                                .title(R.string.sideloadtag)
-                                .customView(R.layout.dialog_sideload_tag, false)
-                                .onPositive((dialog, which) -> {
-                                    String tag = ((EditText) dialog.getCustomView().findViewById(R.id.tag)).getText().toString();
-                                    PackageInstaller.initialize(getActivity()).wget("http://tinyurl.com/" + tag);
-                                    Toast.makeText(getActivity(), R.string.starting_download, Toast.LENGTH_SHORT).show();
-                                })
-                                .positiveText(R.string.Download)
-                                .show();
+                    new SettingOption.OnClickListener() {
+                        @Override
+                        public void onClick() {
+                            new MaterialDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
+                                    .title(R.string.sideloadtag)
+                                    .customView(R.layout.dialog_sideload_tag, false)
+                                    .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                        @Override
+                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                            String tag = ((EditText) dialog.getCustomView().findViewById(R.id.tag)).getText().toString();
+                                            PackageInstaller.initialize(getActivity()).wget("http://tinyurl.com/" + tag);
+                                            Toast.makeText(getActivity(), R.string.starting_download, Toast.LENGTH_SHORT).show();
+                                        }
+                                    })
+                                    .positiveText(R.string.Download)
+                                    .show();
+                        }
                     }
             ));
         }
         optionsRowAdapter.add(new SettingOption(
                 getResources().getDrawable(R.drawable.about_credits),
                 getString(R.string.credits),
-                () -> {
-                    new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
-                            .setTitle(R.string.credits)
-                            .setMessage(R.string.about_app)
-                            .show();
+                new SettingOption.OnClickListener() {
+                    @Override
+                    public void onClick() {
+                        new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
+                                .setTitle(R.string.credits)
+                                .setMessage(R.string.about_app)
+                                .show();
+                    }
                 }
         ));
         header = new HeaderItem(2, getString(R.string.header_more));
@@ -316,9 +349,12 @@ public class MainFragment extends BrowseFragment {
             checkedForUpdates = true;
             new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
                     .setTitle(R.string.update_for_tv_app_repo)
-                    .setPositiveButton(R.string.update, (dialog, which) ->
+                    .setPositiveButton(R.string.update, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
                             mApkDownloadHelper.startDownload(apk.getDefaultDownloadUrl())
-                    )
+                        }
+                    }
                     .show();
         }
     }
@@ -361,9 +397,12 @@ public class MainFragment extends BrowseFragment {
     private class UpdateBackgroundTask extends TimerTask {
         @Override
         public void run() {
-            mHandler.post(() -> {
-                if (mBackgroundURI != null) {
-                    updateBackground(mBackgroundURI.toString());
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (mBackgroundURI != null) {
+                        updateBackground(mBackgroundURI.toString());
+                    }
                 }
             });
         }

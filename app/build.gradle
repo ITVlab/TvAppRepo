@@ -10,9 +10,6 @@ android {
         targetSdkVersion 25
         versionCode 5
         versionName "1.0.3"
-        jackOptions {
-            enabled true
-        }
     }
     buildTypes {
         release {
@@ -29,10 +26,6 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-    }
-    compileOptions {
-        targetCompatibility 1.8
-        sourceCompatibility 1.8
     }
 }
 
