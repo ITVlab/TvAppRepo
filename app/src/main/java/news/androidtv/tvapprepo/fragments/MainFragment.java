@@ -322,6 +322,9 @@ public class MainFragment extends BrowseFragment {
                     }
                 }
         ));
+        // TODO Clean up rows with separate functions
+        // TODO Add a debug menu to delete all apks
+        // TODO Add a settings menu
         header = new HeaderItem(2, getString(R.string.header_more));
         mRowsAdapter.add(new ListRow(header, optionsRowAdapter));
 

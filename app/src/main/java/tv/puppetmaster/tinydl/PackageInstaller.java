@@ -24,7 +24,9 @@ import java.io.File;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import news.androidtv.tvapprepo.BuildConfig;
 import news.androidtv.tvapprepo.R;
@@ -56,7 +58,9 @@ public class PackageInstaller {
     private Activity mActivity;
     private boolean mInProgress;
     private List<DownloadListener> callbackList;
-    // TODO Map successful URIs and prevent them from being executed again.
+    private final Set<String> mToDownloadUris;
+    private Set<String> mDownloadedUris;
+
     private BroadcastReceiver mDownloadCompleteReceiver = new BroadcastReceiver() {
         public void onReceive(Context ctxt, Intent intent) {
             Bundle extras = intent.getExtras();
@@ -69,39 +73,7 @@ public class PackageInstaller {
                 if (status == DownloadManager.STATUS_SUCCESSFUL) {
                     Log.d(TAG, "Download status successful");
                     String uriString = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
-                    // We may have to rename it if it is a PHP file.
-/*                    if (uriString.endsWith("php")) {
-                        File download = new File(uriString);
-                        download.renameTo(new File(download.getPath().replaceAll("php", "apk")));
-                        uriString = download.getAbsolutePath();
-                    }*/
-                    Log.d(TAG, "Now let's query " + uriString);
-                    if (uriString != null && uriString.endsWith(".apk")) {
-                        Toast.makeText(ctxt, R.string.info_download_complete, Toast.LENGTH_LONG).show();
-                        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-                            Log.d(TAG, "Downloaded " + uriString + " on a < 24 device.");
-                            for (DownloadListener callback : callbackList) {
-                                callback.onApkDownloaded(new File(Uri.parse(uriString).getPath()));
-                            }
-                        } else {
-                            // TODO: Nougat install upon download yields "There was a problem parsing the package"
-                            Log.d(TAG, "Downloaded " + uriString + " on a Nougat device.");
-                            for (DownloadListener callback : callbackList) {
-                                callback.onApkDownloadedNougat(new File(Uri.parse(uriString).getPath()));
-                            }
-                        }
-                    } else if (uriString != null) {
-                        return; // Why would we want to delete anything?
-/*                        File fileToDelete = new File(Uri.parse(uriString).getPath());
-                        boolean success = fileToDelete.delete();
-                        Log.i(TAG, "Deletion file. Successful? " + success);
-                        Toast.makeText(ctxt, ctxt.getString(R.string.warning_invalid_tag) + ": " +
-                                (success ? "Removed" : "Unremoved"), Toast.LENGTH_LONG).show();
-                        for (DownloadListener callback : callbackList) {
-                            callback.onFileDeleted(fileToDelete,
-                                    success);
-                        }*/
-                    }
+                    handleDownloadCompleted(uriString);
                 } else {
                     int reason = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_REASON));
                     Log.e(TAG, "Error getting APK: " + reason);
@@ -116,6 +88,8 @@ public class PackageInstaller {
 
     private PackageInstaller() {
         callbackList = new ArrayList<>();
+        mToDownloadUris = new HashSet<>();
+        mDownloadedUris = new HashSet<>();
     }
 
     public static PackageInstaller initialize(Activity activity) {
@@ -137,9 +111,6 @@ public class PackageInstaller {
         if (!chmod()) {
             return;
         }
-        if (DEBUG) {
-            Log.i(TAG, "wget " + downloadUrl);
-        }
         progressStart();
         if (downloadUrl.isEmpty()) {
             progressStop();
@@ -148,10 +119,14 @@ public class PackageInstaller {
             }
             Toast.makeText(mActivity, R.string.warning_invalid_tag, Toast.LENGTH_LONG).show();
         } else {
-            if (DEBUG) {
-                Log.i(TAG, "Starting download");
+            if (!mToDownloadUris.contains(downloadUrl)) {
+                mToDownloadUris.add(downloadUrl);
+                if (DEBUG) {
+                    Log.i(TAG, "wget " + downloadUrl);
+                    Log.i(TAG, "Starting download");
+                }
+                new DownloadFile().execute(downloadUrl);
             }
-            new DownloadFile().execute(downloadUrl);
         }
     }
 
@@ -220,6 +195,47 @@ public class PackageInstaller {
 
     public void deleteFile(File file) {
         new DeleteFile().execute(file);
+    }
+
+    private synchronized void handleDownloadCompleted(String uriString) {
+        // Synchronized method allows only one thread to run this
+        synchronized (mToDownloadUris) {
+            Log.d(TAG, mDownloadedUris.toString());
+            if (!mDownloadedUris.contains(uriString)) {
+                mDownloadedUris.add(uriString);
+                onDownloadCompleted(uriString);
+            }
+        }
+    }
+
+    private synchronized void onDownloadCompleted(String uriString) {
+        Log.d(TAG, "Now let's query " + uriString);
+        if (uriString != null && uriString.endsWith(".apk")) {
+            Toast.makeText(mActivity, R.string.info_download_complete, Toast.LENGTH_LONG).show();
+            if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                Log.d(TAG, "Downloaded " + uriString + " on a < 24 device.");
+                for (DownloadListener callback : callbackList) {
+                    callback.onApkDownloaded(new File(Uri.parse(uriString).getPath()));
+                }
+            } else {
+                // TODO: Nougat install upon download yields "There was a problem parsing the package"
+                Log.d(TAG, "Downloaded " + uriString + " on a Nougat device.");
+                for (DownloadListener callback : callbackList) {
+                    Log.d(TAG, mDownloadedUris.toString());
+                    callback.onApkDownloadedNougat(new File(Uri.parse(uriString).getPath()));
+                }
+            }
+        } else if (uriString != null) {
+            File fileToDelete = new File(Uri.parse(uriString).getPath());
+            boolean success = fileToDelete.delete();
+            Log.i(TAG, "Deletion file. Successful? " + success);
+            Toast.makeText(mActivity, mActivity.getString(R.string.warning_invalid_tag) + ": " +
+                    (success ? "Removed" : "Unremoved"), Toast.LENGTH_LONG).show();
+            for (DownloadListener callback : callbackList) {
+                callback.onFileDeleted(fileToDelete,
+                        success);
+            }
+        }
     }
 
     private class DownloadFile extends AsyncTask<String, Void, Integer> {
