@@ -46,17 +46,25 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.android.volley.NetworkResponse;
+import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -72,6 +80,7 @@ import news.androidtv.tvapprepo.presenters.DownloadedFilesPresenter;
 import news.androidtv.tvapprepo.presenters.LauncherActivitiesPresenter;
 import news.androidtv.tvapprepo.presenters.OptionsCardPresenter;
 import news.androidtv.tvapprepo.utils.PackageInstallerUtils;
+import news.androidtv.tvapprepo.utils.ShortcutPostTask;
 import tv.puppetmaster.tinydl.PackageInstaller;
 
 public class MainFragment extends BrowseFragment {
@@ -233,13 +242,42 @@ public class MainFragment extends BrowseFragment {
         }
 
         // Add a row for Leanback shortcuts
+        // First, let's map all Leanback Launcher apps
+        Intent leanbacks = new Intent(Intent.ACTION_MAIN);
+        leanbacks.addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER);
+        List<ResolveInfo> leanbackActivities = getActivity().getPackageManager()
+                .queryIntentActivities(leanbacks, PackageManager.MATCH_ALL);
+        Set<String> leanbackPackageNames = new HashSet<>();
+        for (ResolveInfo info : leanbackActivities) {
+            leanbackPackageNames.add(info.activityInfo.applicationInfo.packageName);
+        }
+
+        Intent shortcutables = new Intent(Intent.ACTION_MAIN);
+        shortcutables.addCategory(Intent.CATEGORY_LAUNCHER);
         List<ResolveInfo> launcherActivities = getActivity().getPackageManager()
-                .queryIntentActivities(new Intent(Intent.CATEGORY_LAUNCHER), PackageManager.MATCH_ALL);
-        // TODO Filter out those where shortcuts already exist
+                .queryIntentActivities(shortcutables, PackageManager.MATCH_ALL);
+        Iterator<ResolveInfo> infoIterator = launcherActivities.iterator();
+        while (infoIterator.hasNext()) {
+            ResolveInfo info = infoIterator.next();
+
+            // Filter out those where shortcuts already exist
+            Intent shortcut = getActivity().getPackageManager().getLeanbackLaunchIntentForPackage(
+                    "de.eye_interactive.atvl." + info.activityInfo.applicationInfo.name
+            );
+            if (shortcut != null) {
+                infoIterator.remove();
+            }
+
+            // Filter out those activities that are both launcher types
+            if (leanbackPackageNames.contains(info.activityInfo.applicationInfo.packageName)) {
+                infoIterator.remove();
+            }
+        }
+        Log.d(TAG, launcherActivities.toString());
         LauncherActivitiesPresenter launcherActivitiesPresenter = new LauncherActivitiesPresenter();
         ArrayObjectAdapter launcherActivitiesAdapter = new ArrayObjectAdapter(launcherActivitiesPresenter);
         launcherActivitiesAdapter.addAll(0, launcherActivities);
-        HeaderItem launcherActivitiesHeader = new HeaderItem(2, "Need Shortcuts");
+        HeaderItem launcherActivitiesHeader = new HeaderItem(2, "Leanback Shortcuts");
         mRowsAdapter.add(new ListRow(launcherActivitiesHeader, launcherActivitiesAdapter));
 
         // Add a row for credits
@@ -366,7 +404,7 @@ public class MainFragment extends BrowseFragment {
 
     private final class ItemViewClickedListener implements OnItemViewClickedListener {
         @Override
-        public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
+        public void onItemClicked(Presenter.ViewHolder itemViewHolder, final Object item,
                                   RowPresenter.ViewHolder rowViewHolder, Row row) {
 
             if (item instanceof Apk) {
@@ -384,6 +422,54 @@ public class MainFragment extends BrowseFragment {
                 ((SettingOption) item).getClickListener().onClick();
             } else if (item instanceof File) {
                 mApkDownloadHelper.install((File) item);
+            } else if (item instanceof ResolveInfo) {
+                new AlertDialog.Builder(new android.view.ContextThemeWrapper(getActivity(), R.style.dialog_theme))
+                        .setTitle("Create Launcher Shortcut for " +
+                                ((ResolveInfo) item).activityInfo.applicationInfo.loadLabel(getActivity().getPackageManager()) + "?")
+                        .setMessage("A shortcut will be generated and installed. If installed, " +
+                                "it will place a banner on your homescreen. When clicked, it will " +
+                                "launch the app. This shortcut does not replace the app, rather it " +
+                                "just acts as a bridge between the Leanback Launcher and the non-Leanback app.")
+                        .setPositiveButton("Create Shortcut", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Toast.makeText(getActivity(),
+                                        "Please wait. This may take up to 20 seconds.",
+                                        Toast.LENGTH_SHORT).show();
+                                ShortcutPostTask.generateShortcut(getActivity(),
+                                        (ResolveInfo) item,
+                                        new ShortcutPostTask.Callback() {
+                                            @Override
+                                            public void onResponse(NetworkResponse response) {
+                                                try {
+                                                    JSONObject data =
+                                                            new JSONObject(new String(response.data));
+                                                    if (data.getBoolean("build_ok")) {
+                                                        String downloadLink =
+                                                                data.getJSONObject("app")
+                                                                    .getString("download_link");
+                                                        mApkDownloadHelper.startDownload(downloadLink);
+                                                    } else {
+                                                        Toast.makeText(getActivity(),
+                                                                "Build failed",
+                                                                Toast.LENGTH_SHORT).show();
+                                                    }
+                                                } catch (JSONException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onError(VolleyError error) {
+                                                Toast.makeText(getActivity(),
+                                                        "Build failed: " + error.getMessage(),
+                                                        Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                            }
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
             }
         }
     }

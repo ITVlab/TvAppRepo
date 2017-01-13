@@ -56,6 +56,7 @@ public class PackageInstaller {
     private Activity mActivity;
     private boolean mInProgress;
     private List<DownloadListener> callbackList;
+    // TODO Map successful URIs and prevent them from being executed again.
     private BroadcastReceiver mDownloadCompleteReceiver = new BroadcastReceiver() {
         public void onReceive(Context ctxt, Intent intent) {
             Bundle extras = intent.getExtras();
@@ -66,7 +67,15 @@ public class PackageInstaller {
             if (c.moveToFirst()) {
                 int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
                 if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                    Log.d(TAG, "Download status successful");
                     String uriString = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+                    // We may have to rename it if it is a PHP file.
+/*                    if (uriString.endsWith("php")) {
+                        File download = new File(uriString);
+                        download.renameTo(new File(download.getPath().replaceAll("php", "apk")));
+                        uriString = download.getAbsolutePath();
+                    }*/
+                    Log.d(TAG, "Now let's query " + uriString);
                     if (uriString != null && uriString.endsWith(".apk")) {
                         Toast.makeText(ctxt, R.string.info_download_complete, Toast.LENGTH_LONG).show();
                         if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
@@ -82,7 +91,8 @@ public class PackageInstaller {
                             }
                         }
                     } else if (uriString != null) {
-                        File fileToDelete = new File(Uri.parse(uriString).getPath());
+                        return; // Why would we want to delete anything?
+/*                        File fileToDelete = new File(Uri.parse(uriString).getPath());
                         boolean success = fileToDelete.delete();
                         Log.i(TAG, "Deletion file. Successful? " + success);
                         Toast.makeText(ctxt, ctxt.getString(R.string.warning_invalid_tag) + ": " +
@@ -90,12 +100,12 @@ public class PackageInstaller {
                         for (DownloadListener callback : callbackList) {
                             callback.onFileDeleted(fileToDelete,
                                     success);
-                        }
+                        }*/
                     }
                 } else {
                     int reason = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_REASON));
                     Log.e(TAG, "Error getting APK: " + reason);
-                    Toast.makeText(ctxt, ctxt.getString(R.string.warning_invalid_tag) + ": " +
+                    Toast.makeText(ctxt, "Download Error" + ": " +
                             reason, Toast.LENGTH_LONG).show();
                 }
             }
@@ -228,7 +238,8 @@ public class PackageInstaller {
                 return R.string.error_download_failed;
             }
             final String downloadedFileName =
-                    urls[0].substring(urls[0].lastIndexOf("/") + 1).trim() + ".apk";
+                    urls[0].substring(urls[0].lastIndexOf("/") + 1).trim().replaceAll("\\?", "")
+                            + ".apk";
 
             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(downloadUri));
             request.setTitle(mActivity.getString(R.string.app_name) + ": " + downloadedFileName);
@@ -240,6 +251,7 @@ public class PackageInstaller {
                     (DownloadManager) mActivity.getSystemService(Context.DOWNLOAD_SERVICE);
             manager.enqueue(request);
             Log.i(TAG, "Download request for " + urls[0] + " enqueued");
+            Log.d(TAG, "Should be saved to " + downloadedFileName);
             return -1;
         }
 

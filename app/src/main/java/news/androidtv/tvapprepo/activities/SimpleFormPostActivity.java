@@ -79,8 +79,6 @@ public class SimpleFormPostActivity extends Activity {
                 params.put("app_name", "Cybercritters");
                 params.put("app_package", "com.felkertech.n.cybercritters");
                 params.put("app_category", "games"); // Or apps
-                Bitmap appIcon = BitmapFactory.decodeResource(getResources(), R.drawable.app_icon_quantum);
-//                params.put("app_logo2", getStringImage(appIcon)); // Need to stringify bitmap
                 params.put("json", "true");
                 return params;
             }
