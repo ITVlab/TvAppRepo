@@ -46,8 +46,13 @@
                 android:resource="@xml/provider_paths"/>
         </provider>
 
-        <activity android:name=".activities.SimpleFormPostActivity"
-            android:exported="true" />
+        <activity android:name=".activities.SettingsActivity"
+            android:theme="@style/LeanbackPreferences"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
+            </intent-filter>
+        </activity>
 
         <meta-data
             android:name="io.fabric.ApiKey"

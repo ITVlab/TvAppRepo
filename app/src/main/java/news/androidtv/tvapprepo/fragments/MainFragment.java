@@ -72,6 +72,7 @@ import java.util.TimerTask;
 import news.androidtv.tvapprepo.R;
 import news.androidtv.tvapprepo.Utils;
 import news.androidtv.tvapprepo.activities.DetailsActivity;
+import news.androidtv.tvapprepo.activities.SettingsActivity;
 import news.androidtv.tvapprepo.download.ApkDownloadHelper;
 import news.androidtv.tvapprepo.model.Apk;
 import news.androidtv.tvapprepo.model.RepoDatabase;
@@ -344,9 +345,16 @@ public class MainFragment extends BrowseFragment {
                     }
                 }
         ));
-        // TODO Clean up rows with separate functions
-        // TODO Add a debug menu to delete all apks
-        // TODO Add a settings menu
+        optionsRowAdapter.add(new SettingOption(
+                getResources().getDrawable(R.drawable.about_credits),
+                "Settings",
+                new SettingOption.OnClickListener() {
+                    @Override
+                    public void onClick() {
+                        startActivity(new Intent(getActivity(), SettingsActivity.class));
+                    }
+                }
+        ));
         HeaderItem header = new HeaderItem(2, getString(R.string.header_more));
         mRowsAdapter.add(new ListRow(header, optionsRowAdapter));
     }

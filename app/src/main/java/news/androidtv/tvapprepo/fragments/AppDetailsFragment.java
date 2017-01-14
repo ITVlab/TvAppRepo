@@ -264,7 +264,7 @@ public class AppDetailsFragment extends DetailsFragment {
                 Apk application = (Apk) item;
                 Log.d(TAG, "Item: " + item.toString());
                 Intent intent = new Intent(getActivity(), DetailsActivity.class);
-                intent.putExtra(getResources().getString(R.string.movie), mSelectedApk.toString());
+                intent.putExtra(getResources().getString(R.string.apk_string), mSelectedApk.toString());
                 intent.putExtra(getResources().getString(R.string.should_start), true);
                 startActivity(intent);
 

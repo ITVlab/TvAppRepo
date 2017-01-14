@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="Debugging"
+        android:key="debugging"
+        />
+    <Preference
+        android:title="Clean Downloads Folder"
+        android:key="delete_all"
+        />
+    <Preference
+        android:title="@string/build_variant"
+        android:key="build_variant"
+        />
+</PreferenceScreen>

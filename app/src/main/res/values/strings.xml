@@ -5,6 +5,8 @@
     <string name="vertical_grid_title"><![CDATA[Vertical Video Grid]]></string>
     <string name="error">Error</string>
     <string name="ok">OK</string>
+    <string name="apk_string" translatable="false">apk_string</string>
+    <string name="should_start" translatable="false">shouldStart</string>
 
     <!-- Error messages -->
     <string name="video_error_media_load_timeout">Media loading timed out</string>
@@ -34,4 +36,5 @@
     <string name="update_for_tv_app_repo">There is an update for the Tv App Repo</string>
     <string name="header_more">More</string>
     <string name="header_browse">Browse</string>
+    <string name="build_variant">Debug variant</string>
 </resources>
