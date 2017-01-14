@@ -201,27 +201,66 @@ public class MainFragment extends BrowseFragment {
         }
 
         if (getResources().getBoolean(R.bool.ENABLE_DOWNLOADS_ROW)) {
-            // Add a row for downloaded APKs
-            DownloadedFilesPresenter downloadedFilesPresenter = new DownloadedFilesPresenter();
-            ArrayObjectAdapter downloadedFilesAdapter = new ArrayObjectAdapter(downloadedFilesPresenter);
-            File myDownloads = Environment.getExternalStoragePublicDirectory(
-                    Environment.DIRECTORY_DOWNLOADS);
-            // Add them to a list first before we sort them.
-            List<File> downloadedFilesList = new ArrayList<>();
-            downloadedFilesList = getApkDownloads(downloadedFilesList, myDownloads.listFiles());
-
-            // Now sort
-            Collections.sort(downloadedFilesList, new Comparator<File>() {
-                        @Override
-                        public int compare(File file, File t1) {
-                            return (int) (file.lastModified() - t1.lastModified());
-                        }
-                    });
-            downloadedFilesAdapter.addAll(0, downloadedFilesList);
-            HeaderItem downloadedFilesHeader = new HeaderItem(1, getString(R.string.header_downloaded_apks));
-            mRowsAdapter.add(new ListRow(downloadedFilesHeader, downloadedFilesAdapter));
+            createRowDownloadedApks();
         }
 
+        createRowShortcutGenerator();
+
+        createRowMisc();
+
+        setAdapter(mRowsAdapter);
+    }
+
+    private void createRowApkDownloads() {
+        // Add a presenter for APKs - only if allowed
+        ApkPresenter cardPresenter = new ApkPresenter();
+        final ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
+        listRowAdapter.addAll(0, RepoDatabase.getInstance().getAppList());
+        for (Apk apk : RepoDatabase.getInstance().getAppList()) {
+            Log.d(TAG, apk.getPackageName() + " " + Utils.class.getPackage().getName());
+            if (apk.getPackageName().equals(Utils.class.getPackage().getName())) {
+                checkForAppUpdates(apk);
+            }
+        }
+        RepoDatabase.getInstance().addListener(new RepoDatabase.Listener() {
+            @Override
+            public void onApkAdded(Apk apk, int index) {
+                Log.d(TAG, apk.getPackageName() + " " + Utils.class.getPackage().getName());
+                if (apk.getPackageName().equals(Utils.class.getPackage().getName())) {
+                    checkForAppUpdates(apk);
+                } else {
+                    listRowAdapter.add(apk);
+                    listRowAdapter.notifyArrayItemRangeChanged(index, 1);
+                }
+            }
+        });
+        HeaderItem header = new HeaderItem(0, getString(R.string.header_browse));
+        mRowsAdapter.add(new ListRow(header, listRowAdapter));
+    }
+
+    private void createRowDownloadedApks() {
+        // Add a row for downloaded APKs
+        DownloadedFilesPresenter downloadedFilesPresenter = new DownloadedFilesPresenter();
+        ArrayObjectAdapter downloadedFilesAdapter = new ArrayObjectAdapter(downloadedFilesPresenter);
+        File myDownloads = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DOWNLOADS);
+        // Add them to a list first before we sort them.
+        List<File> downloadedFilesList = new ArrayList<>();
+        downloadedFilesList = getApkDownloads(downloadedFilesList, myDownloads.listFiles());
+
+        // Now sort
+        Collections.sort(downloadedFilesList, new Comparator<File>() {
+            @Override
+            public int compare(File file, File t1) {
+                return (int) (file.lastModified() - t1.lastModified());
+            }
+        });
+        downloadedFilesAdapter.addAll(0, downloadedFilesList);
+        HeaderItem downloadedFilesHeader = new HeaderItem(1, getString(R.string.header_downloaded_apks));
+        mRowsAdapter.add(new ListRow(downloadedFilesHeader, downloadedFilesAdapter));
+    }
+
+    private void createRowShortcutGenerator() {
         // Add a row for Leanback shortcuts
         // First, let's map all Leanback Launcher apps
         Intent leanbacks = new Intent(Intent.ACTION_MAIN);
@@ -262,7 +301,9 @@ public class MainFragment extends BrowseFragment {
         launcherActivitiesAdapter.addAll(0, launcherActivities);
         HeaderItem launcherActivitiesHeader = new HeaderItem(2, "Leanback Shortcuts");
         mRowsAdapter.add(new ListRow(launcherActivitiesHeader, launcherActivitiesAdapter));
+    }
 
+    private void createRowMisc() {
         // Add a row for credits
         OptionsCardPresenter optionsCardPresenter = new OptionsCardPresenter();
         ArrayObjectAdapter optionsRowAdapter = new ArrayObjectAdapter(optionsCardPresenter);
@@ -306,37 +347,8 @@ public class MainFragment extends BrowseFragment {
         // TODO Clean up rows with separate functions
         // TODO Add a debug menu to delete all apks
         // TODO Add a settings menu
-        header = new HeaderItem(2, getString(R.string.header_more));
+        HeaderItem header = new HeaderItem(2, getString(R.string.header_more));
         mRowsAdapter.add(new ListRow(header, optionsRowAdapter));
-
-        setAdapter(mRowsAdapter);
-    }
-
-    private void createRowApkDownloads() {
-        // Add a presenter for APKs - only if allowed
-        ApkPresenter cardPresenter = new ApkPresenter();
-        final ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
-        listRowAdapter.addAll(0, RepoDatabase.getInstance().getAppList());
-        for (Apk apk : RepoDatabase.getInstance().getAppList()) {
-            Log.d(TAG, apk.getPackageName() + " " + Utils.class.getPackage().getName());
-            if (apk.getPackageName().equals(Utils.class.getPackage().getName())) {
-                checkForAppUpdates(apk);
-            }
-        }
-        RepoDatabase.getInstance().addListener(new RepoDatabase.Listener() {
-            @Override
-            public void onApkAdded(Apk apk, int index) {
-                Log.d(TAG, apk.getPackageName() + " " + Utils.class.getPackage().getName());
-                if (apk.getPackageName().equals(Utils.class.getPackage().getName())) {
-                    checkForAppUpdates(apk);
-                } else {
-                    listRowAdapter.add(apk);
-                    listRowAdapter.notifyArrayItemRangeChanged(index, 1);
-                }
-            }
-        });
-        HeaderItem header = new HeaderItem(0, getString(R.string.header_browse));
-        mRowsAdapter.add(new ListRow(header, listRowAdapter));
     }
 
     private void prepareBackgroundManager() {
