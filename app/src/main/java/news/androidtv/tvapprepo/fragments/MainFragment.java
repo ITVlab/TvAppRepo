@@ -103,20 +103,31 @@ public class MainFragment extends BrowseFragment {
     private URI mBackgroundURI;
     private BackgroundManager mBackgroundManager;
     private ApkDownloadHelper mApkDownloadHelper;
+    private Set<String> downloadedApkFiles = new HashSet<>();
     private PackageInstaller.DownloadListener mDownloadListener = new PackageInstaller.DownloadListener() {
         @Override
         public void onApkDownloaded(File downloadedApkFile) {
-            mApkDownloadHelper.install(downloadedApkFile);
+            Log.d(TAG, downloadedApkFiles.toString());
+            if (!downloadedApkFiles.contains(downloadedApkFile.getAbsolutePath())) {
+                downloadedApkFiles.add(downloadedApkFile.getAbsolutePath());
+                mApkDownloadHelper.install(downloadedApkFile);
+            }
         }
 
         @Override
         public void onApkDownloadedNougat(final File downloadedApkFile) {
-            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mApkDownloadHelper.install(downloadedApkFile);
-                }
-            }, 1000 * 5);
+            Log.d(TAG, downloadedApkFiles.toString());
+            if (!downloadedApkFiles.contains(downloadedApkFile.getAbsolutePath())) {
+                downloadedApkFiles.add(downloadedApkFile.getAbsolutePath());
+                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.d(TAG, downloadedApkFiles.toString());
+                        mApkDownloadHelper.install(downloadedApkFile);
+                    }
+                }, 1000 * 4);
+            }
+
         }
 
         @Override
