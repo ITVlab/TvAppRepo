@@ -60,6 +60,7 @@ public class PackageInstaller {
     private List<DownloadListener> callbackList;
     private final Set<String> mToDownloadUris;
     private Set<String> mDownloadedUris;
+    private int count;
 
     private BroadcastReceiver mDownloadCompleteReceiver = new BroadcastReceiver() {
         public void onReceive(Context ctxt, Intent intent) {
@@ -67,12 +68,15 @@ public class PackageInstaller {
             DownloadManager.Query q = new DownloadManager.Query();
             q.setFilterById(extras.getLong(DownloadManager.EXTRA_DOWNLOAD_ID));
             Cursor c = DOWNLOAD_MANAGER.query(q);
+            Log.d(TAG, intent.toString());
 
             if (c.moveToFirst()) {
                 int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
+                Log.d(TAG, String.valueOf(count++));
                 if (status == DownloadManager.STATUS_SUCCESSFUL) {
                     Log.d(TAG, "Download status successful");
                     String uriString = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+                    // FIXME being called twice in a row.
                     handleDownloadCompleted(uriString);
                 } else {
                     int reason = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_REASON));
@@ -108,6 +112,10 @@ public class PackageInstaller {
     }
 
     public void wget(@NonNull String downloadUrl) {
+        wget(downloadUrl, null);
+    }
+
+    public void wget(@NonNull String downloadUrl, String filename) {
         if (!chmod()) {
             return;
         }
@@ -125,7 +133,11 @@ public class PackageInstaller {
                     Log.i(TAG, "wget " + downloadUrl);
                     Log.i(TAG, "Starting download");
                 }
-                new DownloadFile().execute(downloadUrl);
+                if (filename == null) {
+                    new DownloadFile().execute(downloadUrl);
+                } else {
+                    new DownloadFile().execute(downloadUrl, filename);
+                }
             }
         }
     }
@@ -254,10 +266,14 @@ public class PackageInstaller {
                 return R.string.error_download_failed;
             }
             // TODO Make more descriptive download names
-            final String downloadedFileName =
-                    urls[0].substring(urls[0].lastIndexOf("/") + 1).trim().replaceAll("\\?", "")
-                            + ".apk";
-
+            String downloadedFileName;
+            if (urls.length >= 2) {
+                downloadedFileName = urls[1] + ".apk";
+            } else {
+                downloadedFileName =
+                        urls[0].substring(urls[0].lastIndexOf("/") + 1).trim().replaceAll("\\?", "")
+                                + ".apk";
+            }
             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(downloadUri));
             request.setTitle(mActivity.getString(R.string.app_name) + ": " + downloadedFileName);
             request.setDescription(mActivity.getString(R.string.directory) + ": " +

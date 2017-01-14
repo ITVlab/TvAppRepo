@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.preference.PreferenceActivity;
 import android.support.annotation.NonNull;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.BrowseFragment;
@@ -185,30 +186,7 @@ public class MainFragment extends BrowseFragment {
         HeaderItem header = null;
 
         if (getResources().getBoolean(R.bool.ENABLE_APP_REPO) && DEBUG_SHOW_APKS) {
-            // Add a presenter for APKs - only if allowed
-            ApkPresenter cardPresenter = new ApkPresenter();
-            final ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
-            listRowAdapter.addAll(0, RepoDatabase.getInstance().getAppList());
-            for (Apk apk : RepoDatabase.getInstance().getAppList()) {
-                Log.d(TAG, apk.getPackageName() + " " + Utils.class.getPackage().getName());
-                if (apk.getPackageName().equals(Utils.class.getPackage().getName())) {
-                    checkForAppUpdates(apk);
-                }
-            }
-            RepoDatabase.getInstance().addListener(new RepoDatabase.Listener() {
-                @Override
-                public void onApkAdded(Apk apk, int index) {
-                    Log.d(TAG, apk.getPackageName() + " " + Utils.class.getPackage().getName());
-                    if (apk.getPackageName().equals(Utils.class.getPackage().getName())) {
-                        checkForAppUpdates(apk);
-                    } else {
-                        listRowAdapter.add(apk);
-                        listRowAdapter.notifyArrayItemRangeChanged(index, 1);
-                    }
-                }
-            });
-            header = new HeaderItem(0, getString(R.string.header_browse));
-            mRowsAdapter.add(new ListRow(header, listRowAdapter));
+           createRowApkDownloads();
         }
 
         if (getResources().getBoolean(R.bool.ENABLE_DOWNLOADS_ROW)) {
@@ -219,14 +197,6 @@ public class MainFragment extends BrowseFragment {
                     Environment.DIRECTORY_DOWNLOADS);
             // Add them to a list first before we sort them.
             List<File> downloadedFilesList = new ArrayList<>();
-/*            for (File download : myDownloads.listFiles()) {
-                try {
-                    Log.d(TAG, download.getName() + " " + download.getCanonicalPath());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }*/
-
             downloadedFilesList = getApkDownloads(downloadedFilesList, myDownloads.listFiles());
 
             // Now sort
@@ -329,6 +299,33 @@ public class MainFragment extends BrowseFragment {
         mRowsAdapter.add(new ListRow(header, optionsRowAdapter));
 
         setAdapter(mRowsAdapter);
+    }
+
+    private void createRowApkDownloads() {
+        // Add a presenter for APKs - only if allowed
+        ApkPresenter cardPresenter = new ApkPresenter();
+        final ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
+        listRowAdapter.addAll(0, RepoDatabase.getInstance().getAppList());
+        for (Apk apk : RepoDatabase.getInstance().getAppList()) {
+            Log.d(TAG, apk.getPackageName() + " " + Utils.class.getPackage().getName());
+            if (apk.getPackageName().equals(Utils.class.getPackage().getName())) {
+                checkForAppUpdates(apk);
+            }
+        }
+        RepoDatabase.getInstance().addListener(new RepoDatabase.Listener() {
+            @Override
+            public void onApkAdded(Apk apk, int index) {
+                Log.d(TAG, apk.getPackageName() + " " + Utils.class.getPackage().getName());
+                if (apk.getPackageName().equals(Utils.class.getPackage().getName())) {
+                    checkForAppUpdates(apk);
+                } else {
+                    listRowAdapter.add(apk);
+                    listRowAdapter.notifyArrayItemRangeChanged(index, 1);
+                }
+            }
+        });
+        HeaderItem header = new HeaderItem(0, getString(R.string.header_browse));
+        mRowsAdapter.add(new ListRow(header, listRowAdapter));
     }
 
     private void prepareBackgroundManager() {
@@ -453,7 +450,8 @@ public class MainFragment extends BrowseFragment {
                                                         String downloadLink =
                                                                 data.getJSONObject("app")
                                                                     .getString("download_link");
-                                                        mApkDownloadHelper.startDownload(downloadLink);
+                                                        mApkDownloadHelper.startDownload(downloadLink,
+                                                                ((ResolveInfo) item).activityInfo.applicationInfo.loadLabel(getActivity().getPackageManager()).toString());
                                                     } else {
                                                         Toast.makeText(getActivity(),
                                                                 "Build failed",

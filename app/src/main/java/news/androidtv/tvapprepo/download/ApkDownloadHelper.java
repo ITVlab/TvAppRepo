@@ -40,7 +40,7 @@ public class ApkDownloadHelper extends AbstractDownloadHelper {
 
     @Override
     public AbstractDownloadHelper startDownload(String url, String adType) {
-        mPackageInstaller.wget(url);
+        mPackageInstaller.wget(url, adType);
         return super.startDownload(url, adType);
     }
 
