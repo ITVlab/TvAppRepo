@@ -346,7 +346,7 @@ public class MainFragment extends BrowseFragment {
                 }
         ));
         optionsRowAdapter.add(new SettingOption(
-                getResources().getDrawable(R.drawable.about_credits),
+                getResources().getDrawable(R.drawable.settings),
                 "Settings",
                 new SettingOption.OnClickListener() {
                     @Override

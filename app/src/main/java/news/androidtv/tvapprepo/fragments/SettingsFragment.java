@@ -1,13 +1,19 @@
 package news.androidtv.tvapprepo.fragments;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v14.preference.PreferenceFragment;
 import android.support.v17.preference.LeanbackPreferenceFragment;
 import android.support.v17.preference.LeanbackSettingsFragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.preference.DialogPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceScreen;
+import android.support.v7.view.ContextThemeWrapper;
+import android.util.Log;
 import android.widget.Toast;
+
+import java.io.File;
 
 import news.androidtv.tvapprepo.R;
 
@@ -17,8 +23,10 @@ import news.androidtv.tvapprepo.R;
 
 public class SettingsFragment extends LeanbackSettingsFragment
         implements DialogPreference.TargetFragment {
-    private final static String PREFERENCE_RESOURCE_ID = "preferenceResource";
-    private final static String PREFERENCE_ROOT = "root";
+    private static final String TAG = SettingsFragment.class.getSimpleName();
+
+    private static final String PREFERENCE_RESOURCE_ID = "preferenceResource";
+    private static final String PREFERENCE_ROOT = "root";
     private PreferenceFragment mPreferenceFragment;
 
     @Override
@@ -72,11 +80,36 @@ public class SettingsFragment extends LeanbackSettingsFragment
         @Override
         public boolean onPreferenceTreeClick(Preference preference) {
             if (preference.getKey().equals("delete_all")) {
-                Toast.makeText(getActivity(), "Feature coming soon", Toast.LENGTH_SHORT).show();
+                File myDownloads = Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_DOWNLOADS);
+                // Add them to a list first before we sort them.
+                deleteApks(myDownloads);
+                Toast.makeText(getActivity(), "Downloaded APK files deleted", Toast.LENGTH_SHORT).show();
             } else if (preference.getKey().equals("build_variant")) {
-                Toast.makeText(getActivity(), "Explain what this means", Toast.LENGTH_SHORT).show();
+                new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
+                        .setTitle("Tv App Repo Variants")
+                        .setMessage(R.string.build_variant_explanation)
+                        .show();
             }
             return super.onPreferenceTreeClick(preference);
+        }
+
+        private void deleteApks(File directory) {
+            File[] downloadedFilesList = directory.listFiles();
+            for (File download : downloadedFilesList) {
+                if (download.getAbsolutePath().toLowerCase().endsWith("apk")) {
+                    boolean delete = download.delete();
+                    if (delete) {
+                        Log.d(TAG, "Deleted " + download.getAbsolutePath());
+                    } else {
+                        Log.d(TAG, "Cannot delete " + download.getAbsolutePath());
+                    }
+                } else if (download.isDirectory()) {
+                    deleteApks(download);
+                } else {
+                    Log.d(TAG, download.getAbsolutePath() + " is not an APK");
+                }
+            }
         }
     }
 }
