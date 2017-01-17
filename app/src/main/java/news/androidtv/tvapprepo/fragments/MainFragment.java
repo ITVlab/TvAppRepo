@@ -87,7 +87,7 @@ import tv.puppetmaster.tinydl.PackageInstaller;
 
 public class MainFragment extends BrowseFragment {
     private static final String TAG = MainFragment.class.getSimpleName();
-    private static final boolean DEBUG_SHOW_APKS = false;
+    private static final boolean DEBUG_SHOW_APKS = true;
 
     private static final int BACKGROUND_UPDATE_DELAY = 300;
     private static final int GRID_ITEM_WIDTH = 200;
@@ -198,7 +198,7 @@ public class MainFragment extends BrowseFragment {
         HeaderItem header = null;
 
         if (getResources().getBoolean(R.bool.ENABLE_APP_REPO) && DEBUG_SHOW_APKS) {
-           createRowApkDownloads();
+            createRowApkDownloads();
         }
 
         if (getResources().getBoolean(R.bool.ENABLE_DOWNLOADS_ROW)) {
