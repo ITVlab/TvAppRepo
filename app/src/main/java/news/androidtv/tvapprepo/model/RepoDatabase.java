@@ -54,6 +54,7 @@ public class RepoDatabase {
             mRepoDatabase = new RepoDatabase();
             final FirebaseDatabase database = FirebaseDatabase.getInstance();
             databaseReference = database.getReference(type);
+            Log.d(TAG, "Create new instance");
             databaseReference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {

@@ -197,7 +197,7 @@ public class MainFragment extends BrowseFragment {
         mApkDownloadHelper.addListener(mDownloadListener);
         HeaderItem header = null;
 
-        if (getResources().getBoolean(R.bool.ENABLE_APP_REPO) && DEBUG_SHOW_APKS) {
+        if (getResources().getBoolean(R.bool.ENABLE_APP_REPO)) {
             createRowApkDownloads();
         }
 
@@ -216,6 +216,7 @@ public class MainFragment extends BrowseFragment {
         // Add a presenter for APKs - only if allowed
         ApkPresenter cardPresenter = new ApkPresenter();
         final ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
+        Log.d(TAG, "Get RepoDatabase instance");
         listRowAdapter.addAll(0, RepoDatabase.getInstance().getAppList());
         for (Apk apk : RepoDatabase.getInstance().getAppList()) {
             Log.d(TAG, apk.getPackageName() + " " + Utils.class.getPackage().getName());

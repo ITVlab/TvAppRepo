@@ -18,7 +18,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.media.MediaMetadataCompat;
 
-import com.colortv.android.ColorTvSdk;
 import com.crashlytics.android.Crashlytics;
 
 import io.fabric.sdk.android.Fabric;

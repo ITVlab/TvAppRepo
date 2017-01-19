@@ -8,8 +8,8 @@ android {
         applicationId "news.androidtv.tvapprepo"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 6
-        versionName "1.0.3"
+        versionCode 7
+        versionName "1.0.4"
     }
     buildTypes {
         release {
@@ -58,7 +58,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-ads:10.0.1'
     compile 'com.google.firebase:firebase-config:10.0.1'
 
-    compile 'com.colortv:android-sdk:2.1.0'
+//    compile 'com.colortv:android-sdk:2.1.0'
     compile 'com.github.bumptech.glide:glide:3.4.0'
     compile 'com.afollestad.material-dialogs:core:0.9.0.2'
     compile 'com.android.volley:volley:1.0.0'

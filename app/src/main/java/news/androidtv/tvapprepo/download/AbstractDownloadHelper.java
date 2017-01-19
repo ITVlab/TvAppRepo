@@ -3,10 +3,6 @@ package news.androidtv.tvapprepo.download;
 import android.app.Activity;
 import android.support.annotation.NonNull;
 
-import com.colortv.android.AdPlacement;
-import com.colortv.android.ColorTvAdListener;
-import com.colortv.android.ColorTvError;
-import com.colortv.android.ColorTvSdk;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -20,25 +16,6 @@ public abstract class AbstractDownloadHelper {
 
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
     private Activity mActivity;
-
-    /*private ColorTvAdListener mListener = new ColorTvAdListener() {
-        @Override
-        public void onAdLoaded(String placement) {
-            ColorTvSdk.showAd(placement);
-        }
-
-        @Override
-        public void onAdError(String placement, ColorTvError colorTvError) {
-        }
-
-        @Override
-        public void onAdClosed(String placement, boolean watched) {
-        }
-
-        @Override
-        public void onAdExpired(String placement) {
-        }
-    };*/
 
     protected AbstractDownloadHelper() {
 
