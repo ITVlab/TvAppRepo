@@ -260,7 +260,12 @@ public class MainFragment extends BrowseFragment {
         Collections.sort(downloadedFilesList, new Comparator<File>() {
             @Override
             public int compare(File file, File t1) {
-                return (int) (file.lastModified() - t1.lastModified());
+                try {
+                    return (int) (file.lastModified() - t1.lastModified());
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException(e.getMessage() + " with " +
+                            file.lastModified() + " & " + t1.lastModified());
+                }
             }
         });
         downloadedFilesAdapter.addAll(0, downloadedFilesList);
