@@ -1,11 +1,14 @@
 package news.androidtv.tvapprepo.model;
 
+import android.support.annotation.Keep;
+
 import java.util.HashMap;
 
 /**
  * HashMap uses a unique serialization scheme, and it's not a standard
  * {@link org.json.JSONObject}. This class converts between this serialization and a map.
  */
+@Keep
 public class FirebaseMap {
     private String mInputData;
     private HashMap<String, String> mMap;

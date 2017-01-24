@@ -1,5 +1,6 @@
 package news.androidtv.tvapprepo.model;
 
+import android.support.annotation.Keep;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -14,6 +15,7 @@ import java.util.Map;
  * @author Nick
  * @version 2016.09.08
  */
+@Keep
 public class Apk {
     private static final String TAG = Apk.class.getSimpleName();
     private static final boolean DEBUG = true;
@@ -42,7 +44,7 @@ public class Apk {
         return downloadUrl;
     }
 
-    private HashMap<String, String> getDownloadMap() {
+    public HashMap<String, String> getDownloadMap() {
         /*if (downloadMap == null) {
             downloadMap = new FirebaseMap(downloadUrl.toString());
         }

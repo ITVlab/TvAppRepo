@@ -54,13 +54,15 @@ public class RepoDatabase {
             mRepoDatabase = new RepoDatabase();
             final FirebaseDatabase database = FirebaseDatabase.getInstance();
             databaseReference = database.getReference(type);
-            Log.d(TAG, "Create new instance");
+            Log.d(TAG, "Create new instance of RepoDatabase");
             databaseReference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     // This method is called once with the initial value and again
                     // whenever data at this location is updated.
+                    Log.d(TAG, "Got new snapshot " + dataSnapshot.toString());
                     for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                        Log.d(TAG, dataSnapshot1.toString());
                         Apk value = dataSnapshot1.getValue(Apk.class);
                         value.setKey(dataSnapshot1.getKey());
                         Log.d(TAG, "Value is: " + value);

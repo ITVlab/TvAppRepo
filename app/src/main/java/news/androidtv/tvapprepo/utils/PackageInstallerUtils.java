@@ -6,6 +6,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageInstaller;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 
 import news.androidtv.tvapprepo.model.Apk;
 
@@ -32,7 +33,7 @@ public class PackageInstallerUtils {
     }
 
     // http://stackoverflow.com/questions/6813322/install-uninstall-apks-programmatically-packagemanager-vs-intents
-    public static void uninstallApp(Activity activity, String packageName) {
+    public static void uninstallApp(Activity activity, @NonNull String packageName) {
         Intent intent = new Intent(Intent.ACTION_DELETE, Uri.fromParts("package",
                 activity.getPackageManager().getPackageArchiveInfo(packageName, 0).packageName,
                 null));

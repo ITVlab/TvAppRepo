@@ -8,23 +8,25 @@ android {
         applicationId "news.androidtv.tvapprepo"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 7
-        versionName "1.0.4"
+        versionCode 8
+        versionName "1.0.5"
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-        playstore { // Build that removes apk repository
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    }
+    signingConfigs {
+        debug {
+        }
+    }
+    productFlavors {
+        opencommunity {
+        }
+        playstore {
             applicationIdSuffix '.playstore'
             versionNameSuffix '-playstore'
-        }
-        opencommunity { // Build that enables apk repository
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 }
@@ -53,13 +55,14 @@ dependencies {
     compile 'com.android.support:leanback-v17:25.1.0'
     compile 'com.android.support:preference-leanback-v17:25.1.0'
     compile 'com.android.support:appcompat-v7:25.1.0'
+    compile 'com.android.support:palette-v7:25.1.0'
 
     compile 'com.google.firebase:firebase-database:10.0.1'
     compile 'com.google.android.gms:play-services-ads:10.0.1'
     compile 'com.google.firebase:firebase-config:10.0.1'
 
 //    compile 'com.colortv:android-sdk:2.1.0'
-    compile 'com.github.bumptech.glide:glide:3.4.0'
+    compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.afollestad.material-dialogs:core:0.9.0.2'
     compile 'com.android.volley:volley:1.0.0'
 

@@ -1,8 +1,11 @@
 package news.androidtv.tvapprepo.presenters;
 
 import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.support.v17.leanback.widget.ImageCardView;
 import android.support.v17.leanback.widget.Presenter;
+import android.support.v7.graphics.Palette;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.ViewGroup;
@@ -31,7 +34,6 @@ public class LauncherActivitiesPresenter extends CardPresenter {
         ImageCardView cardView = new ImageCardView(contextThemeWrapper);
         cardView.setFocusable(true);
         cardView.setFocusableInTouchMode(true);
-        cardView.setBackgroundColor(parent.getResources().getColor(R.color.primaryDark));
         return new ViewHolder(cardView);
     }
 
@@ -47,5 +49,16 @@ public class LauncherActivitiesPresenter extends CardPresenter {
         cardView.setContentText(app.activityInfo.name);
         cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT);
         cardView.getMainImageView().setScaleType(ImageView.ScaleType.FIT_CENTER);
+        BitmapDrawable bitmapDrawable = (BitmapDrawable) app.activityInfo.loadIcon(contextThemeWrapper.getPackageManager());
+        Palette.generateAsync(bitmapDrawable.getBitmap(), new Palette.PaletteAsyncListener() {
+            @Override
+            public void onGenerated(Palette palette) {
+                // Here's your generated palette
+                if (palette.getDarkVibrantSwatch() != null) {
+                    cardView.findViewById(R.id.info_field).setBackgroundColor(
+                            palette.getDarkVibrantSwatch().getRgb());
+                }
+            }
+        });
     }
 }

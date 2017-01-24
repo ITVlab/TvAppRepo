@@ -293,7 +293,11 @@ public class AppDetailsFragment extends DetailsFragment {
                         download(mSelectedApk.getDefaultDownloadUrl());
                     }
                 } else if (action.getId() == ACTION_UNINSTALL) {
-                    PackageInstallerUtils.uninstallApp(getActivity(), mSelectedApk.getPackageName());
+                    if (mSelectedApk.getPackageName() == null) {
+                        Toast.makeText(getActivity(), "Cannot uninstall using null package name.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        PackageInstallerUtils.uninstallApp(getActivity(), mSelectedApk.getPackageName());
+                    }
                 }
             }
         }

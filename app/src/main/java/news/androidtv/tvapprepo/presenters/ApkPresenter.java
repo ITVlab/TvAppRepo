@@ -14,13 +14,18 @@
 
 package news.androidtv.tvapprepo.presenters;
 
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.support.v17.leanback.widget.ImageCardView;
 import android.support.v17.leanback.widget.Presenter;
+import android.support.v7.graphics.Palette;
+import android.transition.Transition;
 import android.util.Log;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import news.androidtv.tvapprepo.R;
 import news.androidtv.tvapprepo.model.Apk;
@@ -40,15 +45,7 @@ public class ApkPresenter extends Presenter {
     private static int sDefaultBackgroundColor;
     private Drawable mDefaultCardImage;
 
-    private static void updateCardBackgroundColor(ImageCardView view, boolean selected) {
-        int color = selected ? sSelectedBackgroundColor : sDefaultBackgroundColor;
-        // Both background colors should be set because the view's background is temporarily visible
-        // during animations.
-        view.setBackgroundColor(color);
-        view.findViewById(R.id.info_field).setBackgroundColor(color);
-    }
-
-    @Override
+      @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
         Log.d(TAG, "onCreateViewHolder");
 
@@ -59,21 +56,19 @@ public class ApkPresenter extends Presenter {
         ImageCardView cardView = new ImageCardView(parent.getContext()) {
             @Override
             public void setSelected(boolean selected) {
-                updateCardBackgroundColor(this, selected);
                 super.setSelected(selected);
             }
         };
 
         cardView.setFocusable(true);
         cardView.setFocusableInTouchMode(true);
-        updateCardBackgroundColor(cardView, false);
         return new ViewHolder(cardView);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, Object item) {
         Apk application = (Apk) item;
-        ImageCardView cardView = (ImageCardView) viewHolder.view;
+        final ImageCardView cardView = (ImageCardView) viewHolder.view;
 
         Log.d(TAG, "onBindViewHolder");
         if (application.getBanner() != null) {
@@ -81,10 +76,24 @@ public class ApkPresenter extends Presenter {
             cardView.setContentText("Version " + application.getVersionName());
             cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT);
             Glide.with(viewHolder.view.getContext())
-                    .load(application.getBanner())
-                    .centerCrop()
-                    .error(mDefaultCardImage)
-                    .into(cardView.getMainImageView());
+                    .load(!application.getBanner().isEmpty() ? application.getBanner() : application.getIcon())
+                    .asBitmap()
+                    .into(new BitmapImageViewTarget(cardView.getMainImageView()) {
+                        @Override
+                        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                            super.onResourceReady(resource, glideAnimation);
+                            Palette.generateAsync(resource, new Palette.PaletteAsyncListener() {
+                                @Override
+                                public void onGenerated(Palette palette) {
+                                    // Here's your generated palette
+                                    if (palette.getDarkVibrantSwatch() != null) {
+                                        cardView.findViewById(R.id.info_field).setBackgroundColor(
+                                                palette.getDarkVibrantSwatch().getRgb());
+                                    }
+                                }
+                            });
+                        }
+                    });
         }
     }
 

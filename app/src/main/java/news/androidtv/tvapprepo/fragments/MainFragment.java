@@ -168,6 +168,12 @@ public class MainFragment extends BrowseFragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+//        loadRows();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         loadRows();
