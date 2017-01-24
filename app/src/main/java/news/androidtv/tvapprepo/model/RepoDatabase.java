@@ -62,17 +62,23 @@ public class RepoDatabase {
                     // whenever data at this location is updated.
                     Log.d(TAG, "Got new snapshot " + dataSnapshot.toString());
                     for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
-                        Log.d(TAG, dataSnapshot1.toString());
-                        Apk value = dataSnapshot1.getValue(Apk.class);
-                        value.setKey(dataSnapshot1.getKey());
-                        Log.d(TAG, "Value is: " + value);
-                        if (apps.containsKey(value.getPackageName()) &&
-                                apps.get(value.getPackageName()).getVersionCode() < value.getVersionCode() ||
-                                !apps.containsKey(value.getPackageName())) {
-                            for (Listener listener : listenerList) {
-                                listener.onApkAdded(value, apps.size());
+                        try {
+                            Log.d(TAG, dataSnapshot1.toString());
+                            Apk value = dataSnapshot1.getValue(Apk.class);
+                            value.setKey(dataSnapshot1.getKey());
+                            Log.d(TAG, "Value is: " + value);
+                            if (apps.containsKey(value.getPackageName()) &&
+                                    apps.get(value.getPackageName()).getVersionCode() < value.getVersionCode() ||
+                                    !apps.containsKey(value.getPackageName())) {
+                                for (Listener listener : listenerList) {
+                                    listener.onApkAdded(value, apps.size());
+                                }
+                                apps.put(value.getPackageName(), value);
                             }
-                            apps.put(value.getPackageName(), value);
+                        } catch (RuntimeException e) {
+                            // Something weird happened. Debug it.
+                            throw new FirebaseIsBeingWeirdException("Something weird happens to Firebase here: " +
+                                    dataSnapshot1.toString() + " in " + dataSnapshot.toString());
                         }
                     }
                 }
@@ -195,5 +201,11 @@ public class RepoDatabase {
         void onNoLeanbackShortcut();
         void onLeanbackShortcut(LeanbackShortcut leanbackShortcut);
         void onDatabaseError(DatabaseError error);
+    }
+
+    private static class FirebaseIsBeingWeirdException extends RuntimeException {
+        public FirebaseIsBeingWeirdException(String s) {
+            super(s);
+        }
     }
 }

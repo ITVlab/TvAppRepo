@@ -486,9 +486,9 @@ public class MainFragment extends BrowseFragment {
                                         new ShortcutPostTask.Callback() {
                                             @Override
                                             public void onResponse(NetworkResponse response) {
+                                                JSONObject data = null;
                                                 try {
-                                                    JSONObject data =
-                                                            new JSONObject(new String(response.data));
+                                                    data = new JSONObject(new String(response.data));
                                                     if (data.getBoolean("build_ok")) {
                                                         String downloadLink =
                                                                 data.getJSONObject("app")
@@ -502,6 +502,11 @@ public class MainFragment extends BrowseFragment {
                                                     }
                                                 } catch (JSONException e) {
                                                     e.printStackTrace();
+                                                } catch (NullPointerException e) {
+                                                    throw new NullPointerException(e.getMessage() +
+                                                            "\nSomething odd is happening for " +
+                                                            ((ResolveInfo) item).activityInfo.packageName
+                                                            + "\n" + data.toString());
                                                 }
                                             }
 
