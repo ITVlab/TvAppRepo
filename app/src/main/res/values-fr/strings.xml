@@ -1,0 +1,42 @@
+<resources>
+    <string name="app_name">Tv App Repo</string>
+    <string name="browse_title">Applis Tv</string>
+    <string name="related_movies">Vidéos similaires</string>
+    <string name="vertical_grid_title"><![CDATA[Grille vidéo verticale]]></string>
+    <string name="error">Erreur</string>
+    <string name="ok">OK</string>
+
+    <!-- Error messages -->
+    <string name="video_error_media_load_timeout">Le chargement du média ne répond pas</string>
+    <string name="video_error_server_inaccessible">Le serveur média n\'est pas joignable</string>
+    <string name="video_error_unknown_error">Erreur : impossible de charger la vidéo</string>
+    <string name="error_fragment_message">Une erreur s\'est produite</string>
+    <string name="dismiss_error">Annuler</string>
+    <string name="oops">Oops</string>
+    <string name="update">Mettre à jour</string>
+    <string name="uninstall">Désinstaller</string>
+    <string name="install">Installer</string>
+    <string name="app_not_leanback">Cette application n\'est pas optimisée pour les TV.</string>
+    <string name="app_leanback">Appli Leanback</string>
+    <string name="info_download_complete">Téléchargement terminé</string>
+    <string name="warning_invalid_tag">Tag non valide</string>
+    <string name="error_starting_intent">Erreur lors de l\'initialisation</string>
+    <string name="error_download_failed">Erreur : téléchargement échoué</string>
+    <string name="directory">Directory</string>
+    <string name="error_deleting_file">Erreur : impossible de supprimer le fichier</string>
+    <string name="header_downloaded_apks">APK téléchargés</string>
+    <string name="install_through_sideloadtag">Installer via un tag</string>
+    <string name="sideloadtag">#SIDELOADTAG</string>
+    <string name="starting_download">Démarrage du téléchargement...</string>
+    <string name="Download">Télécharger</string>
+    <string name="credits">Crédits</string>
+    <string name="about_app">Conçu par ITV Lab.\n\nUtilise le code source ouvert de #SIDELOADTAG.</string>
+    <string name="update_for_tv_app_repo">Une mise à jour pour Tv App Repo est disponible</string>
+    <string name="header_more">Plus</string>
+    <string name="header_browse">Parcourir</string>
+    <string name="build_variant">Variante debug</string>
+    <string name="build_variant_explanation">"There are several different versions of this app for various purposes.\n\n- Open Community: This version enables APK downloads from a central APK host. It can be downloaded on GitHub, but is not available on Google Play.\n\n- Play Store: This version is distributed on the Play Store, and includes every feature except the central APK host.\n\n- Debug: Unsigned version of the app."</string>
+    <string name="delete_all">Vider le dossier de téléchargement</string>
+    <string name="debugging">Débogage</string>
+    <string name="leanback_shortcuts">Raccourcis Leanback</string>
+</resources>
