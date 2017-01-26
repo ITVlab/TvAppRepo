@@ -39,4 +39,5 @@
     <string name="delete_all">Vider le dossier de téléchargement</string>
     <string name="debugging">Débogage</string>
     <string name="leanback_shortcuts">Raccourcis Leanback</string>
+    <string name="sideload_content">Vous pouvez télécharger des applis comme #SIDELOADTAG. Saisissez un tag.</string>
 </resources>

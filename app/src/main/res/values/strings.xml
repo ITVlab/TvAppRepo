@@ -41,4 +41,5 @@
     <string name="delete_all">Clean Downloads Folder</string>
     <string name="debugging">Debugging</string>
     <string name="leanback_shortcuts">Leanback Shortcuts</string>
+    <string name="sideload_content">You can download apps just like #SIDELOADTAG. Enter a tag below.</string>
 </resources>
