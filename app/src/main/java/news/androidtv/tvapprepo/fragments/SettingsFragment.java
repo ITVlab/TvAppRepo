@@ -96,6 +96,9 @@ public class SettingsFragment extends LeanbackSettingsFragment
 
         private void deleteApks(File directory) {
             File[] downloadedFilesList = directory.listFiles();
+            if (downloadedFilesList == null) {
+                return; // There is nothing to delete!
+            }
             for (File download : downloadedFilesList) {
                 if (download.getAbsolutePath().toLowerCase().endsWith("apk")) {
                     boolean delete = download.delete();

@@ -14,6 +14,7 @@
 
 package news.androidtv.tvapprepo.fragments;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -96,6 +97,7 @@ public class MainFragment extends BrowseFragment {
     private static final int NUM_COLS = 15;
 
     private boolean checkedForUpdates = true;
+    private Activity mMainActivity;
     private final Handler mHandler = new Handler();
     private ArrayObjectAdapter mRowsAdapter;
     private Drawable mDefaultBackground;
@@ -149,12 +151,13 @@ public class MainFragment extends BrowseFragment {
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        Log.i(TAG, "onCreate");
         super.onActivityCreated(savedInstanceState);
+        Log.i(TAG, "onCreate");
         prepareBackgroundManager();
         setupUIElements();
         loadRows();
         setupEventListeners();
+        mMainActivity = getActivity();
     }
 
     @Override
@@ -287,8 +290,12 @@ public class MainFragment extends BrowseFragment {
 
         Intent shortcutables = new Intent(Intent.ACTION_MAIN);
         shortcutables.addCategory(Intent.CATEGORY_LAUNCHER);
-        List<ResolveInfo> launcherActivities = getActivity().getPackageManager()
+        List<ResolveInfo> launcherActivitiesTemp = getActivity().getPackageManager()
                 .queryIntentActivities(shortcutables, PackageManager.MATCH_ALL);
+        // Need to convert to an arraylist to iterate
+        ArrayList<ResolveInfo> launcherActivities = new ArrayList<>();
+        launcherActivities.addAll(launcherActivitiesTemp);
+
         Iterator<ResolveInfo> infoIterator = launcherActivities.iterator();
         while (infoIterator.hasNext()) {
             ResolveInfo info = infoIterator.next();
@@ -486,28 +493,7 @@ public class MainFragment extends BrowseFragment {
                                         new ShortcutPostTask.Callback() {
                                             @Override
                                             public void onResponse(NetworkResponse response) {
-                                                JSONObject data = null;
-                                                try {
-                                                    data = new JSONObject(new String(response.data));
-                                                    if (data.getBoolean("build_ok")) {
-                                                        String downloadLink =
-                                                                data.getJSONObject("app")
-                                                                    .getString("download_link");
-                                                        mApkDownloadHelper.startDownload(downloadLink,
-                                                                ((ResolveInfo) item).activityInfo.applicationInfo.loadLabel(getActivity().getPackageManager()).toString());
-                                                    } else {
-                                                        Toast.makeText(getActivity(),
-                                                                "Build failed",
-                                                                Toast.LENGTH_SHORT).show();
-                                                    }
-                                                } catch (JSONException e) {
-                                                    e.printStackTrace();
-                                                } catch (NullPointerException e) {
-                                                    throw new NullPointerException(e.getMessage() +
-                                                            "\nSomething odd is happening for " +
-                                                            ((ResolveInfo) item).activityInfo.packageName
-                                                            + "\n" + data.toString());
-                                                }
+                                                downloadShortcutApk(response, item);
                                             }
 
                                             @Override
@@ -521,6 +507,38 @@ public class MainFragment extends BrowseFragment {
                         })
                         .setNegativeButton("Cancel", null)
                         .show();
+            }
+        }
+
+        private void downloadShortcutApk(NetworkResponse response, Object item) {
+            JSONObject data = null;
+            try {
+                data = new JSONObject(new String(response.data));
+                if (data.getBoolean("build_ok")) {
+                    String downloadLink =
+                            data.getJSONObject("app")
+                                    .getString("download_link");
+                    if (mApkDownloadHelper == null) {
+                        mApkDownloadHelper = new ApkDownloadHelper(getActivity());
+                    }
+                    if (getActivity() == null && mMainActivity == null) {
+                        throw new NullPointerException("Activity variable doesn't exist");
+                    }
+                    mApkDownloadHelper.startDownload(downloadLink,
+                            ((ResolveInfo) item).activityInfo.applicationInfo
+                                    .loadLabel(getActivity().getPackageManager()).toString());
+                } else {
+                    Toast.makeText(getActivity(),
+                            "Build failed",
+                            Toast.LENGTH_SHORT).show();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (NullPointerException e) {
+                throw new NullPointerException(e.getMessage() +
+                        "\nSomething odd is happening for " +
+                        ((ResolveInfo) item).activityInfo.packageName
+                        + "\n" + data.toString());
             }
         }
     }

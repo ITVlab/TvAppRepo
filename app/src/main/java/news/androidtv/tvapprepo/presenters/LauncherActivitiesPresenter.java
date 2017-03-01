@@ -49,7 +49,15 @@ public class LauncherActivitiesPresenter extends CardPresenter {
         cardView.setContentText(app.activityInfo.name);
         cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT);
         cardView.getMainImageView().setScaleType(ImageView.ScaleType.FIT_CENTER);
-        BitmapDrawable bitmapDrawable = (BitmapDrawable) app.activityInfo.loadIcon(contextThemeWrapper.getPackageManager());
+        BitmapDrawable bitmapDrawable;
+        try {
+            bitmapDrawable = (BitmapDrawable) app.activityInfo
+                    .loadIcon(contextThemeWrapper.getPackageManager());
+        } catch (ClassCastException e) {
+            // Probably some other sort of drawable (?)
+            // Use a default.
+            bitmapDrawable = (BitmapDrawable) contextThemeWrapper.getDrawable(R.drawable.banner);
+        }
         Palette.generateAsync(bitmapDrawable.getBitmap(), new Palette.PaletteAsyncListener() {
             @Override
             public void onGenerated(Palette palette) {
