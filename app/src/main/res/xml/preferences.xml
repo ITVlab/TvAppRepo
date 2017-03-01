@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-        android:title="Debugging"
+        android:title="@string/debugging"
         android:key="debugging"
         />
     <Preference
-        android:title="Clean Downloads Folder"
+        android:title="@string/delete_all"
         android:key="delete_all"
         />
     <Preference

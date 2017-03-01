@@ -319,7 +319,7 @@ public class MainFragment extends BrowseFragment {
         LauncherActivitiesPresenter launcherActivitiesPresenter = new LauncherActivitiesPresenter();
         ArrayObjectAdapter launcherActivitiesAdapter = new ArrayObjectAdapter(launcherActivitiesPresenter);
         launcherActivitiesAdapter.addAll(0, launcherActivities);
-        HeaderItem launcherActivitiesHeader = new HeaderItem(2, "Leanback Shortcuts");
+        HeaderItem launcherActivitiesHeader = new HeaderItem(2, getString(R.string.leanback_shortcuts));
         mRowsAdapter.add(new ListRow(launcherActivitiesHeader, launcherActivitiesAdapter));
     }
 
