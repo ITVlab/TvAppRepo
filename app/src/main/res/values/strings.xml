@@ -38,4 +38,8 @@
     <string name="header_browse">Browse</string>
     <string name="build_variant">Debug variant</string>
     <string name="build_variant_explanation">"There are several different versions of this app for various purposes.\n\n- Open Community: This version enables APK downloads from a central APK host. It can be downloaded on GitHub, but is not available on Google Play.\n\n- Play Store: This version is distributed on the Play Store, and includes every feature except the central APK host.\n\n- Debug: Unsigned version of the app."</string>
+    <string name="delete_all">Clean Downloads Folder</string>
+    <string name="debugging">Debugging</string>
+    <string name="leanback_shortcuts">Leanback Shortcuts</string>
+    <string name="sideload_content">You can download apps just like #SIDELOADTAG. Enter a tag below.</string>
 </resources>

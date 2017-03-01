@@ -8,7 +8,7 @@
         android:layout_marginRight="32dp"
         android:layout_marginBottom="16dp"
         android:layout_marginTop="16dp"
-        android:text="You can download apps just like #SIDELOADTAG. Enter a tag below."
+        android:text="@string/sideload_content"
         android:layout_height="wrap_content" />
     <EditText
         android:layout_width="match_parent"
