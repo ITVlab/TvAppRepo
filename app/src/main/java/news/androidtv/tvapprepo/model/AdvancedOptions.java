@@ -28,6 +28,7 @@ public class AdvancedOptions {
 
     public AdvancedOptions setBannerUrl(String bannerUrl) {
         mReady++;
+        mBannerUrl = bannerUrl;
         // Download from Glide.
         downloadBanner(mContext, bannerUrl, new GlideCallback() {
             @Override

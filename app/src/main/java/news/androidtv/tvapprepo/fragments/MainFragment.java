@@ -224,7 +224,7 @@ public class MainFragment extends BrowseFragment {
 
     private void createRowApkDownloads() {
         // Add a presenter for APKs - only if allowed
-        ApkPresenter cardPresenter = new ApkPresenter();
+        ApkPresenter cardPresenter = new ApkPresenter(getActivity());
         final ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
         Log.d(TAG, "Get RepoDatabase instance");
         listRowAdapter.addAll(0, RepoDatabase.getInstance().getAppList());
@@ -367,7 +367,7 @@ public class MainFragment extends BrowseFragment {
         ));
         optionsRowAdapter.add(new SettingOption(
                 getResources().getDrawable(R.drawable.settings),
-                "Settings",
+                getString(R.string.settings),
                 new SettingOption.OnClickListener() {
                     @Override
                     public void onClick() {

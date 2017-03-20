@@ -116,7 +116,7 @@ public class AppDetailsFragment extends DetailsFragment {
         @Override
         public void onProgressStarted() {
             // Show a video ad
-            Toast.makeText(getActivity(), "Download Started...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.download_started, Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -148,7 +148,7 @@ public class AppDetailsFragment extends DetailsFragment {
         } else {
             Intent intent = new Intent(getActivity(), MainActivity.class);
             startActivity(intent);
-            Toast.makeText(getActivity(), "No app selected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.no_app_selected, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -281,7 +281,7 @@ public class AppDetailsFragment extends DetailsFragment {
                     if (mSelectedApk.getDownloadCount() > 1) {
                         // Display picker
                         new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
-                                .setTitle("Download which APK variant?")
+                                .setTitle(R.string.title_apk_variants)
                                 .setItems(mSelectedApk.getDownloadTitleArray(), new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -294,7 +294,7 @@ public class AppDetailsFragment extends DetailsFragment {
                     }
                 } else if (action.getId() == ACTION_UNINSTALL) {
                     if (mSelectedApk.getPackageName() == null) {
-                        Toast.makeText(getActivity(), "Cannot uninstall using null package name.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), R.string.warn_null_package_name, Toast.LENGTH_SHORT).show();
                     } else {
                         PackageInstallerUtils.uninstallApp(getActivity(), mSelectedApk.getPackageName());
                     }

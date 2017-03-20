@@ -20,6 +20,18 @@ public class Apk {
     private static final String TAG = Apk.class.getSimpleName();
     private static final boolean DEBUG = true;
 
+    private static final String KEY_NAME = "name";
+    private static final String KEY_BANNER = "banner";
+    private static final String KEY_ICON = "icon";
+    private static final String KEY_DOWNLOAD_URL = "downloadUrl";
+    private static final String KEY_PACKAGE_NAME = "packageName";
+    private static final String KEY_SUBMISSION_DATE = "submissionDate";
+    private static final String KEY_VERSION_CODE = "versionCode";
+    private static final String KEY_VERSION_NAME = "versionName";
+    private static final String KEY = "key";
+    private static final String KEY_DOWNLOADS = "downloads";
+    private static final String KEY_VIEWS = "views";
+
     private String banner;
     private Map<String, String> downloadUrl;
 //    private FirebaseMap downloadMap;
@@ -115,17 +127,17 @@ public class Apk {
     public String toString() {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("name", name);
-            jsonObject.put("banner", banner);
-            jsonObject.put("icon", icon);
-            jsonObject.put("downloadUrl", downloadUrl);
-            jsonObject.put("packageName", packageName);
-            jsonObject.put("submissionDate", submitted);
-            jsonObject.put("versionCode", versionCode);
-            jsonObject.put("versionName", versionName);
-            jsonObject.put("key", key);
-            jsonObject.put("downloads", downloads);
-            jsonObject.put("views", views);
+            jsonObject.put(KEY_NAME, name);
+            jsonObject.put(KEY_BANNER, banner);
+            jsonObject.put(KEY_ICON, icon);
+            jsonObject.put(KEY_DOWNLOAD_URL, downloadUrl);
+            jsonObject.put(KEY_PACKAGE_NAME, packageName);
+            jsonObject.put(KEY_SUBMISSION_DATE, submitted);
+            jsonObject.put(KEY_VERSION_CODE, versionCode);
+            jsonObject.put(KEY_VERSION_NAME, versionName);
+            jsonObject.put(KEY, key);
+            jsonObject.put(KEY_DOWNLOADS, downloads);
+            jsonObject.put(KEY_VIEWS, views);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -145,19 +157,19 @@ public class Apk {
                 JSONObject jsonObject = new JSONObject(serial);
                 Log.d(TAG, jsonObject.toString());
                 mApk = new Apk();
-                mApk.name = jsonObject.getString("name");
-                mApk.banner = jsonObject.getString("banner");
-                mApk.icon = jsonObject.getString("icon");
-                String downloadUrl = jsonObject.getString("downloadUrl");
+                mApk.name = jsonObject.getString(KEY_NAME);
+                mApk.banner = jsonObject.getString(KEY_BANNER);
+                mApk.icon = jsonObject.getString(KEY_ICON);
+                String downloadUrl = jsonObject.getString(KEY_DOWNLOAD_URL);
                 Log.d(TAG, downloadUrl);
                 mApk.downloadUrl = new FirebaseMap(downloadUrl).getMap();
-                mApk.packageName = jsonObject.getString("packageName");
-                mApk.submitted = jsonObject.getLong("submissionDate");
-                mApk.versionCode = jsonObject.getInt("versionCode");
-                mApk.versionName = jsonObject.getString("versionName");
-                mApk.key = jsonObject.getString("key");
-                mApk.downloads = jsonObject.getLong("downloads");
-                mApk.views = jsonObject.getLong("views");
+                mApk.packageName = jsonObject.getString(KEY_PACKAGE_NAME);
+                mApk.submitted = jsonObject.getLong(KEY_SUBMISSION_DATE);
+                mApk.versionCode = jsonObject.getInt(KEY_VERSION_CODE);
+                mApk.versionName = jsonObject.getString(KEY_VERSION_NAME);
+                mApk.key = jsonObject.getString(KEY);
+                mApk.downloads = jsonObject.getLong(KEY_DOWNLOADS);
+                mApk.views = jsonObject.getLong(KEY_VIEWS);
             } catch (JSONException e) {
                 throw new RuntimeException(e.getMessage());
             }

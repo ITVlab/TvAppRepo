@@ -14,6 +14,7 @@
 
 package news.androidtv.tvapprepo.presenters;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.support.v17.leanback.widget.ImageCardView;
@@ -44,6 +45,11 @@ public class ApkPresenter extends Presenter {
     private static int sSelectedBackgroundColor;
     private static int sDefaultBackgroundColor;
     private Drawable mDefaultCardImage;
+    private Context mContext;
+
+    public ApkPresenter(Context context) {
+        mContext = context;
+    }
 
       @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
@@ -73,7 +79,7 @@ public class ApkPresenter extends Presenter {
         Log.d(TAG, "onBindViewHolder");
         if (application.getBanner() != null) {
             cardView.setTitleText(application.getName());
-            cardView.setContentText("Version " + application.getVersionName());
+            cardView.setContentText(mContext.getString(R.string.version_number, application.getVersionName()));
             cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT);
             Glide.with(viewHolder.view.getContext())
                     .load(!application.getBanner().isEmpty() ? application.getBanner() : application.getIcon())

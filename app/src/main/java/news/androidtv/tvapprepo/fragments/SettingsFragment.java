@@ -84,10 +84,10 @@ public class SettingsFragment extends LeanbackSettingsFragment
                         Environment.DIRECTORY_DOWNLOADS);
                 // Add them to a list first before we sort them.
                 deleteApks(myDownloads);
-                Toast.makeText(getActivity(), "Downloaded APK files deleted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.downloaded_files_deleted, Toast.LENGTH_SHORT).show();
             } else if (preference.getKey().equals("build_variant")) {
                 new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
-                        .setTitle("Tv App Repo Variants")
+                        .setTitle(R.string.title_app_variants)
                         .setMessage(R.string.build_variant_explanation)
                         .show();
             }

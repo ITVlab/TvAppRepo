@@ -7,6 +7,7 @@ import android.content.pm.ResolveInfo;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.app.AlertDialog;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Switch;
@@ -31,37 +32,37 @@ public class GenerateShortcutHelper {
     private static final String KEY_DOWNLOAD_URL = "download_link";
 
     public static void begin(final Activity activity, final ResolveInfo resolveInfo) {
-        new AlertDialog.Builder(new android.view.ContextThemeWrapper(activity, R.style.dialog_theme))
-                .setTitle("Create Launcher Shortcut for " +
-                        resolveInfo.activityInfo.applicationInfo.loadLabel(activity.getPackageManager()) + "?")
-                .setMessage("A shortcut will be generated and installed. If installed, " +
-                        "it will place a banner on your homescreen. When clicked, it will " +
-                        "launch the app. This shortcut does not replace the app, rather it " +
-                        "just acts as a bridge between the Leanback Launcher and the non-Leanback app.")
-                .setPositiveButton("Create Shortcut", new DialogInterface.OnClickListener() {
+
+        new AlertDialog.Builder(new ContextThemeWrapper(activity, R.style.dialog_theme))
+                .setTitle(activity.getString(R.string.title_shortcut_generator,
+                        resolveInfo.activityInfo.applicationInfo.loadLabel(activity.getPackageManager())))
+                .setMessage(R.string.shortcut_generator_info)
+                .setPositiveButton(R.string.create_shortcut, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         generateShortcut(activity, resolveInfo);
                     }
                 })
-                .setNeutralButton("Advanced", new DialogInterface.OnClickListener() {
+                .setNeutralButton(R.string.advanced, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // Open a new dialog
                         openAdvancedOptions(activity, resolveInfo);
                     }
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 
     private static void openAdvancedOptions(final Activity activity, final ResolveInfo resolveInfo) {
         final AlertDialog dialog = new AlertDialog.Builder(activity)
-                .setTitle("Advanced Options")
+                .setTitle(R.string.advanced_options)
                 .setView(R.layout.dialog_app_shortcut_editor)
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(R.string.cancel, null)
                 .show();
-        dialog.setButton(Dialog.BUTTON_POSITIVE, "Create Shortcut", new DialogInterface.OnClickListener() {
+        dialog.setButton(Dialog.BUTTON_POSITIVE,
+                activity.getString(R.string.create_shortcut),
+                new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int which) {
                 View editor = dialog.getWindow().getDecorView();
@@ -90,7 +91,7 @@ public class GenerateShortcutHelper {
                         ((ResolveInfo) item).activityInfo.applicationInfo
                                 .loadLabel(activity.getPackageManager()).toString());
             } else {
-                Toast.makeText(activity, "Build failed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, R.string.err_build_failed, Toast.LENGTH_SHORT).show();
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -119,7 +120,7 @@ public class GenerateShortcutHelper {
             return;
         }
         Toast.makeText(activity,
-                "Please wait. This may take up to 20 seconds.",
+                R.string.msg_pls_wait,
                 Toast.LENGTH_SHORT).show();
         ShortcutPostTask.generateShortcut(activity,
                 resolveInfo,
@@ -134,7 +135,7 @@ public class GenerateShortcutHelper {
                     @Override
                     public void onError(VolleyError error) {
                         Toast.makeText(activity,
-                                "Build failed: " + error.getMessage(),
+                                activity.getString(R.string.err_build_failed_reason, error.getMessage()),
                                 Toast.LENGTH_SHORT).show();
                     }
                 });

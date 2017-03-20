@@ -83,11 +83,11 @@ public class ShortcutPostTask {
             @Override
             public void onErrorResponse(VolleyError error) {
                 if  (error.networkResponse != null) {
-//                    Log.e(TAG, "Error: " + error.networkResponse.headers);
-//                    Log.e(TAG, "Error: " + new String(error.networkResponse.data));
+                    Log.e(TAG, "Error: " + error.networkResponse.headers);
+                    Log.e(TAG, "Error: " + new String(error.networkResponse.data));
                 }
-//                Log.e(TAG, "Error: " + error.getMessage());
-//                Log.d(TAG, error.toString());
+                Log.e(TAG, "Error: " + error.getMessage());
+                Log.d(TAG, error.toString());
                 callback.onError(error);
             }
         }){

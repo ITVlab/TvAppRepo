@@ -42,4 +42,21 @@
     <string name="debugging">Debugging</string>
     <string name="leanback_shortcuts">Leanback Shortcuts</string>
     <string name="sideload_content">You can download apps just like #SIDELOADTAG. Enter a tag below.</string>
+    <string name="download_started">Download Started...</string>
+    <string name="no_app_selected">No app selected</string>
+    <string name="title_apk_variants">Download which APK variant?</string>
+    <string name="warn_null_package_name">Cannot uninstall using null package name.</string>
+    <string name="settings">Settings</string>
+    <string name="downloaded_files_deleted">Downloaded APK files deleted</string>
+    <string name="title_app_variants">Tv App Repo Variants</string>
+    <string name="version_number">Version %1$s</string>
+    <string name="title_shortcut_generator">Create Launcher Shortcut for %1$s?</string>
+    <string name="shortcut_generator_info">"A shortcut will be generated and installed. If installed, it will place a banner on your homescreen. When clicked, it will launch the app. This shortcut does not replace the app, rather it just acts as a bridge between the Leanback Launcher and the non-Leanback app."</string>
+    <string name="create_shortcut">Create Shortcut</string>
+    <string name="advanced">Advanced</string>
+    <string name="cancel">Cancel</string>
+    <string name="advanced_options">Advanced Options</string>
+    <string name="err_build_failed">Build failed</string>
+    <string name="err_build_failed_reason">Build failed: %1$s</string>
+    <string name="msg_pls_wait">Please wait. This may take up to 20 seconds.</string>
 </resources>
