@@ -2,7 +2,10 @@ package news.androidtv.tvapprepo.utils;
 
 import android.content.Context;
 import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
@@ -14,13 +17,17 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.modules.VolleyMultipartRequest;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import news.androidtv.tvapprepo.R;
+import news.androidtv.tvapprepo.model.AdvancedOptions;
 
 /**
  * Created by Nick on 1/12/2017.
@@ -54,14 +61,14 @@ public class ShortcutPostTask {
     private static final String FORM_APP_LOGO = "app_logo";
     private static final String FORM_APP_BANNER = "app_banner";
     private static final String FORM_JSON = "json";
-    private static final String CATEGORY_GAMES = "games";
-    private static final String CATEGORY_APPS = "apps";
+    public static final String CATEGORY_GAMES = "games";
+    public static final String CATEGORY_APPS = "apps";
 
     private ShortcutPostTask() {
     }
 
     public static void generateShortcut(final Context context, final ResolveInfo app,
-            final Callback callback) {
+            final AdvancedOptions options, final Callback callback) {
         RequestQueue queue = Volley.newRequestQueue(context);
 
         VolleyMultipartRequest sr = new VolleyMultipartRequest(Request.Method.POST,
@@ -89,7 +96,10 @@ public class ShortcutPostTask {
                 Map<String,String> params = new HashMap<>();
                 params.put(FORM_APP_NAME, app.activityInfo.loadLabel(context.getPackageManager()).toString());
                 params.put(FORM_APP_PACKAGE, app.activityInfo.applicationInfo.packageName);
-                params.put(FORM_APP_CATEGORY, CATEGORY_APPS); // Or apps
+                params.put(FORM_APP_CATEGORY, CATEGORY_APPS);
+                if (!options.getCategory().isEmpty()) {
+                    params.put(FORM_APP_CATEGORY, options.getCategory());
+                }
                 params.put(FORM_JSON, "true");
                 return params;
             }
@@ -103,6 +113,10 @@ public class ShortcutPostTask {
                         VolleyMultipartRequest.getFileDataFromDrawable(context,
                                 app.activityInfo.loadIcon(context.getPackageManager())),
                                 "image/png"));
+                if (options.getBanner() != null) {
+                    params.put(FORM_APP_LOGO, new DataPart("file_avatar.png", options.getBanner(),
+                            "image/png"));
+                }
                 return params;
             }
         };

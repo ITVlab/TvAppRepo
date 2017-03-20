@@ -82,6 +82,7 @@ import news.androidtv.tvapprepo.presenters.ApkPresenter;
 import news.androidtv.tvapprepo.presenters.DownloadedFilesPresenter;
 import news.androidtv.tvapprepo.presenters.LauncherActivitiesPresenter;
 import news.androidtv.tvapprepo.presenters.OptionsCardPresenter;
+import news.androidtv.tvapprepo.utils.GenerateShortcutHelper;
 import news.androidtv.tvapprepo.utils.PackageInstallerUtils;
 import news.androidtv.tvapprepo.utils.ShortcutPostTask;
 import tv.puppetmaster.tinydl.PackageInstaller;
@@ -475,70 +476,7 @@ public class MainFragment extends BrowseFragment {
             } else if (item instanceof File) {
                 mApkDownloadHelper.install((File) item);
             } else if (item instanceof ResolveInfo) {
-                new AlertDialog.Builder(new android.view.ContextThemeWrapper(getActivity(), R.style.dialog_theme))
-                        .setTitle("Create Launcher Shortcut for " +
-                                ((ResolveInfo) item).activityInfo.applicationInfo.loadLabel(getActivity().getPackageManager()) + "?")
-                        .setMessage("A shortcut will be generated and installed. If installed, " +
-                                "it will place a banner on your homescreen. When clicked, it will " +
-                                "launch the app. This shortcut does not replace the app, rather it " +
-                                "just acts as a bridge between the Leanback Launcher and the non-Leanback app.")
-                        .setPositiveButton("Create Shortcut", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                Toast.makeText(getActivity(),
-                                        "Please wait. This may take up to 20 seconds.",
-                                        Toast.LENGTH_SHORT).show();
-                                ShortcutPostTask.generateShortcut(getActivity(),
-                                        (ResolveInfo) item,
-                                        new ShortcutPostTask.Callback() {
-                                            @Override
-                                            public void onResponse(NetworkResponse response) {
-                                                downloadShortcutApk(response, item);
-                                            }
-
-                                            @Override
-                                            public void onError(VolleyError error) {
-                                                Toast.makeText(getActivity(),
-                                                        "Build failed: " + error.getMessage(),
-                                                        Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
-                            }
-                        })
-                        .setNegativeButton("Cancel", null)
-                        .show();
-            }
-        }
-
-        private void downloadShortcutApk(NetworkResponse response, Object item) {
-            JSONObject data = null;
-            try {
-                data = new JSONObject(new String(response.data));
-                if (data.getBoolean("build_ok")) {
-                    String downloadLink =
-                            data.getJSONObject("app")
-                                    .getString("download_link");
-                    if (mApkDownloadHelper == null) {
-                        mApkDownloadHelper = new ApkDownloadHelper(getActivity());
-                    }
-                    if (getActivity() == null && mMainActivity == null) {
-                        throw new NullPointerException("Activity variable doesn't exist");
-                    }
-                    mApkDownloadHelper.startDownload(downloadLink,
-                            ((ResolveInfo) item).activityInfo.applicationInfo
-                                    .loadLabel(getActivity().getPackageManager()).toString());
-                } else {
-                    Toast.makeText(getActivity(),
-                            "Build failed",
-                            Toast.LENGTH_SHORT).show();
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (NullPointerException e) {
-                throw new NullPointerException(e.getMessage() +
-                        "\nSomething odd is happening for " +
-                        ((ResolveInfo) item).activityInfo.packageName
-                        + "\n" + data.toString());
+                GenerateShortcutHelper.begin(mMainActivity, (ResolveInfo) item);
             }
         }
     }
