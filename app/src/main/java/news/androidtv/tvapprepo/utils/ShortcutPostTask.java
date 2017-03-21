@@ -114,7 +114,7 @@ public class ShortcutPostTask {
                                 app.activityInfo.loadIcon(context.getPackageManager())),
                                 "image/png"));
                 if (options.getBanner() != null) {
-                    params.put(FORM_APP_LOGO, new DataPart("file_avatar.png", options.getBanner(),
+                    params.put(FORM_APP_BANNER, new DataPart("file_avatar.png", options.getBanner(),
                             "image/png"));
                 }
                 return params;

@@ -55,11 +55,11 @@ public class GenerateShortcutHelper {
     }
 
     private static void openAdvancedOptions(final Activity activity, final ResolveInfo resolveInfo) {
-        final AlertDialog dialog = new AlertDialog.Builder(activity)
+        final AlertDialog dialog = new AlertDialog.Builder(new ContextThemeWrapper(activity, R.style.dialog_theme))
                 .setTitle(R.string.advanced_options)
                 .setView(R.layout.dialog_app_shortcut_editor)
                 .setNegativeButton(R.string.cancel, null)
-                .show();
+                .create();
         dialog.setButton(Dialog.BUTTON_POSITIVE,
                 activity.getString(R.string.create_shortcut),
                 new DialogInterface.OnClickListener() {
@@ -74,6 +74,7 @@ public class GenerateShortcutHelper {
                 generateShortcut(activity, resolveInfo, options);
             }
         });
+        dialog.show();
     }
 
     private static void downloadShortcutApk(Activity activity, NetworkResponse response, Object item) {
