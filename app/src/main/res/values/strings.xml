@@ -23,13 +23,13 @@
     <string name="info_download_complete">Download Complete</string>
     <string name="warning_invalid_tag">Invalid Tag</string>
     <string name="error_starting_intent">Error starting intent</string>
-    <string name="error_download_failed">Error : Download Failed</string>
+    <string name="error_download_failed">Error - Download Failed</string>
     <string name="directory">Directory</string>
     <string name="error_deleting_file">Error deleting file</string>
     <string name="header_downloaded_apks">Downloaded APKs</string>
     <string name="install_through_sideloadtag">Install through tag</string>
     <string name="sideloadtag">#SIDELOADTAG</string>
-    <string name="starting_download">Starting download...</string>
+    <string name="starting_download">Starting download…</string>
     <string name="Download">Download</string>
     <string name="credits">Credits</string>
     <string name="about_app">Built by ITV Lab.\n\nUses open source code from #SIDELOADTAG.</string>
@@ -42,7 +42,7 @@
     <string name="debugging">Debugging</string>
     <string name="leanback_shortcuts">Leanback Shortcuts</string>
     <string name="sideload_content">You can download apps just like #SIDELOADTAG. Enter a tag below.</string>
-    <string name="download_started">Download Started...</string>
+    <string name="download_started">Download Started…</string>
     <string name="no_app_selected">No app selected</string>
     <string name="title_apk_variants">Download which APK variant?</string>
     <string name="warn_null_package_name">Cannot uninstall using null package name.</string>

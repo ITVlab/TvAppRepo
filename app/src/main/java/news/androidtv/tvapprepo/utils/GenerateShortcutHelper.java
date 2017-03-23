@@ -105,7 +105,7 @@ public class GenerateShortcutHelper {
     }
 
     private static void generateShortcut(final Activity activity, final ResolveInfo resolveInfo) {
-        generateShortcut(activity, resolveInfo, null);
+        generateShortcut(activity, resolveInfo, new AdvancedOptions(activity));
     }
 
     private static void generateShortcut(final Activity activity, final ResolveInfo resolveInfo,

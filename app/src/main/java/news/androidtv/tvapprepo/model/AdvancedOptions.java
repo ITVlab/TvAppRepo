@@ -19,8 +19,8 @@ public class AdvancedOptions {
     private volatile int mReady = 0;
     private String mCategory = "";
     private String mBannerUrl = "";
-    private byte[] mBannerData;
-    private Context mContext;
+    private byte[] mBannerData = null;
+    private Context mContext = null;
 
     public AdvancedOptions(Context context) {
         mContext = context;
@@ -51,6 +51,10 @@ public class AdvancedOptions {
 
     public byte[] getBanner() {
         return mBannerData;
+    }
+
+    public String getBannerUrl() {
+        return mBannerUrl;
     }
 
     public String getCategory() {
