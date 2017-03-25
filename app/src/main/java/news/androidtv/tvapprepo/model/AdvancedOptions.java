@@ -27,6 +27,10 @@ public class AdvancedOptions {
     }
 
     public AdvancedOptions setBannerUrl(String bannerUrl) {
+        if (bannerUrl == null || bannerUrl.isEmpty()) {
+            // Exit early.
+            return this;
+        }
         mReady++;
         mBannerUrl = bannerUrl;
         // Download from Glide.
