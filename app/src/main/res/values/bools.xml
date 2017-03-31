@@ -3,4 +3,5 @@
     <bool name="ENABLE_SIDELOADTAG">true</bool>
     <bool name="ENABLE_DOWNLOADS_ROW">true</bool>
     <bool name="ENABLE_APP_REPO">true</bool>
+    <bool name="ENABLE_RAW_INTENTS">true</bool>
 </resources>
