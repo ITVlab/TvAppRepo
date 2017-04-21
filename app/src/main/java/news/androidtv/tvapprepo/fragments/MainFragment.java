@@ -474,6 +474,7 @@ public class MainFragment extends BrowseFragment {
             } else if (item instanceof SettingOption) {
                 ((SettingOption) item).getClickListener().onClick();
             } else if (item instanceof File) {
+                Log.d(TAG, "Open file " + ((File) item).getAbsolutePath());
                 mApkDownloadHelper.install((File) item);
             } else if (item instanceof ResolveInfo) {
                 GenerateShortcutHelper.begin(mMainActivity, (ResolveInfo) item);

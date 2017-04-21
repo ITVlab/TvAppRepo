@@ -8,8 +8,8 @@ android {
         applicationId "news.androidtv.tvapprepo"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 11
-        versionName "1.0.7-b"
+        versionCode 12
+        versionName "1.0.7-c"
     }
     buildTypes {
         release {
