@@ -7,6 +7,7 @@ import android.content.pm.ResolveInfo;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.EditText;
@@ -15,6 +16,10 @@ import android.widget.Toast;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.VolleyError;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,6 +32,8 @@ import news.androidtv.tvapprepo.model.AdvancedOptions;
  * Created by Nick Felker on 3/20/2017.
  */
 public class GenerateShortcutHelper {
+    private static final String TAG = GenerateShortcutHelper.class.getSimpleName();
+
     private static final String KEY_BUILD_STATUS = "build_ok";
     private static final String KEY_APP_OBJ = "app";
     private static final String KEY_DOWNLOAD_URL = "download_link";
@@ -123,13 +130,15 @@ public class GenerateShortcutHelper {
         Toast.makeText(activity,
                 R.string.msg_pls_wait,
                 Toast.LENGTH_SHORT).show();
+
+        final InterstitialAd video = showVisualAd(activity);
+
         ShortcutPostTask.generateShortcut(activity,
                 resolveInfo,
                 options,
                 new ShortcutPostTask.Callback() {
                     @Override
                     public void onResponse(NetworkResponse response) {
-                        // TODO Hide ad
                         downloadShortcutApk(activity, response, resolveInfo);
                     }
 
@@ -140,6 +149,33 @@ public class GenerateShortcutHelper {
                                 Toast.LENGTH_SHORT).show();
                     }
                 });
-        // TODO Show visual ad
+    }
+
+    static InterstitialAd showVisualAd(Activity activity) {
+        final InterstitialAd video =  new InterstitialAd(activity);
+        video.setAdUnitId(activity.getString(R.string.interstitial_ad_unit_id));
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .build();
+        video.loadAd(adRequest);
+        Log.d(TAG, "Loading ad");
+
+        video.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                super.onAdLoaded();
+                Log.d(TAG, "Ad loaded");
+                // Show video as soon as possible
+                video.show();
+            }
+
+            @Override
+            public void onAdClosed() {
+                super.onAdClosed();
+                Log.d(TAG, "Ad closed");
+            }
+        });
+
+        return video;
     }
 }
