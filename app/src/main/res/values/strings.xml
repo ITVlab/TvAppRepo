@@ -8,25 +8,45 @@
     <string name="apk_string" translatable="false">apk_string</string>
     <string name="should_start" translatable="false">shouldStart</string>
 
+    <string name="header_downloaded_apks">Downloaded APKs</string>
+    <string name="header_custom">Custom Shortcuts</string>
+    <string name="header_more">More</string>
+    <string name="header_browse">Browse</string>
+
+    <string name="update">Update</string>
+    <string name="uninstall">Uninstall</string>
+    <string name="install">Install</string>
+    <string name="dismiss_error">Dismiss</string>
+
+    <string name="generate_web_bookmark">Generate Web Bookmark</string>
+    <string name="generate_shortcut">Generate Shortcut</string>
+    <string name="generate_folder">Generate Folder</string>
+    <string name="generate_settings">Shortcut to Settings</string>
+    <string name="generate_deep_link">Activity Deep Link</string>
+
+    <string name="generate_web_bookmark_info">Enter a URL and a shortcut will be created to open that in any third-party web browser.</string>
+    <string name="generate_folder_info">A folder will appear on the side of the screen with a list of apps inside. You can continue to change the apps in the folder, but the title cannot change.</string>
+
+
     <!-- Error messages -->
     <string name="video_error_media_load_timeout">Media loading timed out</string>
     <string name="video_error_server_inaccessible">Media server was not reachable</string>
     <string name="video_error_unknown_error">Failed to load video</string>
     <string name="error_fragment_message">An error occurred</string>
-    <string name="dismiss_error">Dismiss</string>
     <string name="oops">Oops</string>
-    <string name="update">Update</string>
-    <string name="uninstall">Uninstall</string>
-    <string name="install">Install</string>
+
     <string name="app_not_leanback">This app is not optimized for TVs.</string>
     <string name="app_leanback">Leanback app</string>
+
     <string name="info_download_complete">Download Complete</string>
     <string name="warning_invalid_tag">Invalid Tag</string>
     <string name="error_starting_intent">Error starting intent</string>
     <string name="error_download_failed">Error - Download Failed</string>
-    <string name="directory">Directory</string>
     <string name="error_deleting_file">Error deleting file</string>
-    <string name="header_downloaded_apks">Downloaded APKs</string>
+    <string name="err_build_failed">Build failed</string>
+    <string name="err_build_failed_reason">Build failed: %1$s</string>
+
+    <string name="directory">Directory</string>
     <string name="install_through_sideloadtag">Install through tag</string>
     <string name="sideloadtag">#SIDELOADTAG</string>
     <string name="starting_download">Starting download…</string>
@@ -34,8 +54,7 @@
     <string name="credits">Credits</string>
     <string name="about_app">Built by ITV Lab.\n\nUses open source code from #SIDELOADTAG.</string>
     <string name="update_for_tv_app_repo">There is an update for the Tv App Repo</string>
-    <string name="header_more">More</string>
-    <string name="header_browse">Browse</string>
+
     <string name="build_variant">Debug variant</string>
     <string name="build_variant_explanation">"There are several different versions of this app for various purposes.\n\n- Open Community: This version enables APK downloads from a central APK host. It can be downloaded on GitHub, but is not available on Google Play.\n\n- Play Store: This version is distributed on the Play Store, and includes every feature except the central APK host.\n\n- Debug: Unsigned version of the app."</string>
     <string name="delete_all">Clean Downloads Folder</string>
@@ -56,7 +75,7 @@
     <string name="advanced">Advanced</string>
     <string name="cancel">Cancel</string>
     <string name="advanced_options">Advanced Options</string>
-    <string name="err_build_failed">Build failed</string>
-    <string name="err_build_failed_reason">Build failed: %1$s</string>
     <string name="msg_pls_wait">Please wait. This may take up to 20 seconds.</string>
+    <string name="generate_file_shortcut">File Link</string>
+
 </resources>

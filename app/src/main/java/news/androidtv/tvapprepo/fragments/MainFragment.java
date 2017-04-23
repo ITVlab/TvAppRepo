@@ -92,10 +92,6 @@ public class MainFragment extends BrowseFragment {
     private static final boolean DEBUG_SHOW_APKS = true;
 
     private static final int BACKGROUND_UPDATE_DELAY = 300;
-    private static final int GRID_ITEM_WIDTH = 200;
-    private static final int GRID_ITEM_HEIGHT = 200;
-    private static final int NUM_ROWS = 6;
-    private static final int NUM_COLS = 15;
 
     private boolean checkedForUpdates = true;
     private Activity mMainActivity;
@@ -174,7 +170,6 @@ public class MainFragment extends BrowseFragment {
     @Override
     public void onStart() {
         super.onStart();
-//        loadRows();
     }
 
     @Override
@@ -216,6 +211,8 @@ public class MainFragment extends BrowseFragment {
         }
 
         createRowShortcutGenerator();
+
+        createRowCustomShortcuts();
 
         createRowMisc();
 
@@ -322,6 +319,138 @@ public class MainFragment extends BrowseFragment {
         launcherActivitiesAdapter.addAll(0, launcherActivities);
         HeaderItem launcherActivitiesHeader = new HeaderItem(2, getString(R.string.leanback_shortcuts));
         mRowsAdapter.add(new ListRow(launcherActivitiesHeader, launcherActivitiesAdapter));
+    }
+
+    private void createRowCustomShortcuts() {
+        if (!getResources().getBoolean(R.bool.ENABLE_RAW_INTENTS)) {
+            return; // Don't do this at all.
+        }
+        // Add a row for credits
+        OptionsCardPresenter optionsCardPresenter = new OptionsCardPresenter();
+        ArrayObjectAdapter optionsRowAdapter = new ArrayObjectAdapter(optionsCardPresenter);
+        if (getResources().getBoolean(R.bool.ENABLE_WEB_BOOKMARKS)) {
+            optionsRowAdapter.add(new SettingOption(
+                    getResources().getDrawable(R.drawable.web_bookmark),
+                    getString(R.string.generate_web_bookmark),
+                    new SettingOption.OnClickListener() {
+                        @Override
+                        public void onClick() {
+                            new MaterialDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
+                                    .title(R.string.generate_web_bookmark)
+                                    .customView(R.layout.dialog_web_bookmark, false)
+                                    .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                        @Override
+                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                            String tag = ((EditText) dialog.getCustomView().findViewById(R.id.tag)).getText().toString();
+
+                                            Toast.makeText(getActivity(), R.string.starting_download, Toast.LENGTH_SHORT).show();
+                                        }
+                                    })
+                                    .positiveText(R.string.generate_shortcut)
+                                    .show();
+                        }
+                    }
+            ));
+        }
+        if (getResources().getBoolean(R.bool.ENABLE_FOLDERS)) {
+            optionsRowAdapter.add(new SettingOption(
+                    getResources().getDrawable(R.drawable.folder),
+                    getString(R.string.generate_folder),
+                    new SettingOption.OnClickListener() {
+                        @Override
+                        public void onClick() {
+                            new MaterialDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
+                                    .title(R.string.generate_folder)
+                                    .customView(R.layout.dialog_folder, false)
+                                    .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                        @Override
+                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                            String tag = ((EditText) dialog.getCustomView().findViewById(R.id.tag)).getText().toString();
+
+                                            Toast.makeText(getActivity(), R.string.starting_download, Toast.LENGTH_SHORT).show();
+                                        }
+                                    })
+                                    .positiveText(R.string.generate_shortcut)
+                                    .show();
+                        }
+                    }
+            ));
+        }
+        if (getResources().getBoolean(R.bool.ENABLE_SETTINGS)) {
+            optionsRowAdapter.add(new SettingOption(
+                    getResources().getDrawable(R.drawable.sys_settings),
+                    getString(R.string.generate_settings),
+                    new SettingOption.OnClickListener() {
+                        @Override
+                        public void onClick() {
+                            new MaterialDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
+                                    .title(R.string.generate_settings)
+                                    .customView(R.layout.dialog_folder, false)
+                                    .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                        @Override
+                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                            String tag = ((EditText) dialog.getCustomView().findViewById(R.id.tag)).getText().toString();
+
+                                            Toast.makeText(getActivity(), R.string.starting_download, Toast.LENGTH_SHORT).show();
+                                        }
+                                    })
+                                    .positiveText(R.string.generate_shortcut)
+                                    .show();
+                        }
+                    }
+            ));
+        }
+        if (getResources().getBoolean(R.bool.ENABLE_APP_DEEPLINKS)) {
+            optionsRowAdapter.add(new SettingOption(
+                    getResources().getDrawable(R.drawable.deep_link),
+                    getString(R.string.generate_deep_link),
+                    new SettingOption.OnClickListener() {
+                        @Override
+                        public void onClick() {
+                            new MaterialDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
+                                    .title(R.string.generate_deep_link)
+                                    .customView(R.layout.dialog_folder, false)
+                                    .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                        @Override
+                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                            String tag = ((EditText) dialog.getCustomView().findViewById(R.id.tag)).getText().toString();
+
+                                            Toast.makeText(getActivity(), R.string.starting_download, Toast.LENGTH_SHORT).show();
+                                        }
+                                    })
+                                    .positiveText(R.string.generate_shortcut)
+                                    .show();
+                        }
+                    }
+            ));
+        }
+        if (getResources().getBoolean(R.bool.ENABLE_FILE_URIS)) {
+            optionsRowAdapter.add(new SettingOption(
+                    getResources().getDrawable(R.drawable.file_location),
+                    getString(R.string.generate_file_shortcut),
+                    new SettingOption.OnClickListener() {
+                        @Override
+                        public void onClick() {
+                            new MaterialDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
+                                    .title(R.string.generate_file_shortcut)
+                                    .customView(R.layout.dialog_folder, false)
+                                    .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                        @Override
+                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                            String tag = ((EditText) dialog.getCustomView().findViewById(R.id.tag)).getText().toString();
+
+                                            Toast.makeText(getActivity(), R.string.starting_download, Toast.LENGTH_SHORT).show();
+                                        }
+                                    })
+                                    .positiveText(R.string.generate_shortcut)
+                                    .show();
+                        }
+                    }
+            ));
+        }
+
+        HeaderItem header = new HeaderItem(2, getString(R.string.header_custom));
+        mRowsAdapter.add(new ListRow(header, optionsRowAdapter));
     }
 
     private void createRowMisc() {
