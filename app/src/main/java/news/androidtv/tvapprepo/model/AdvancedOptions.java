@@ -18,7 +18,12 @@ import news.androidtv.tvapprepo.utils.ShortcutPostTask;
 public class AdvancedOptions {
     private volatile int mReady = 0;
     private String mCategory = "";
+    private String mIconUrl = "";
     private String mBannerUrl = "";
+    private String mIntentUri = "";
+    private String mCustomLabel = "";
+    private boolean mUnique = false;
+    private byte[] mIconData = null;
     private byte[] mBannerData = null;
     private Context mContext = null;
 
@@ -49,8 +54,48 @@ public class AdvancedOptions {
         return this;
     }
 
+    public AdvancedOptions setIntentUri(String intentUri) {
+        if (intentUri.length() < 20 || intentUri.length() > 300) {
+            throw new StringLengthException();
+        }
+        mIntentUri = intentUri;
+        return this;
+    }
+
+    public AdvancedOptions setUniquePackageName(boolean isUnique) {
+        mUnique = isUnique;
+        return this;
+    }
+
+    public AdvancedOptions setCustomLabel(String label) {
+        mCustomLabel = label;
+        return this;
+    }
+
+    public AdvancedOptions setIconUrl(String iconUrl) {
+        if (iconUrl == null || iconUrl.isEmpty()) {
+            // Exit early.
+            return this;
+        }
+        mReady++;
+        mIconUrl = iconUrl;
+        // Download from Glide.
+        downloadBanner(mContext, iconUrl, new GlideCallback() {
+            @Override
+            public void onDone(byte[] binaryData) {
+                mIconData = binaryData;
+                mReady--;
+            }
+        });
+        return this;
+    }
+
     public boolean isReady() {
         return mReady == 0;
+    }
+
+    public byte[] getIcon() {
+        return mIconData;
     }
 
     public byte[] getBanner() {
@@ -63,6 +108,22 @@ public class AdvancedOptions {
 
     public String getCategory() {
         return mCategory;
+    }
+
+    public String getIntentUri() {
+        return mIntentUri;
+    }
+
+    public String getCustomLabel() {
+        return mCustomLabel;
+    }
+
+    public boolean isUnique() {
+        return mUnique;
+    }
+
+    public String getIconUrl() {
+        return mIconUrl;
     }
 
     private void downloadBanner(final Context context, final String url, final GlideCallback callback) {
@@ -89,5 +150,11 @@ public class AdvancedOptions {
 
     private interface GlideCallback {
         void onDone(byte[] binaryData);
+    }
+
+    public class StringLengthException extends RuntimeException {
+        public StringLengthException() {
+            super("Intent URI length must be between 20 and 300 characters");
+        }
     }
 }

@@ -1,17 +1,3 @@
-/*
- * Copyright (C) 2014 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
- */
-
 package news.androidtv.tvapprepo.fragments;
 
 import android.app.Activity;
@@ -24,7 +10,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
-import android.preference.PreferenceActivity;
 import android.support.annotation.NonNull;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.BrowseFragment;
@@ -40,23 +25,18 @@ import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.view.ContextThemeWrapper;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.android.volley.NetworkResponse;
-import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.net.URI;
@@ -82,14 +62,13 @@ import news.androidtv.tvapprepo.presenters.ApkPresenter;
 import news.androidtv.tvapprepo.presenters.DownloadedFilesPresenter;
 import news.androidtv.tvapprepo.presenters.LauncherActivitiesPresenter;
 import news.androidtv.tvapprepo.presenters.OptionsCardPresenter;
+import news.androidtv.tvapprepo.ui.ShortcutGeneratorDialogs;
 import news.androidtv.tvapprepo.utils.GenerateShortcutHelper;
 import news.androidtv.tvapprepo.utils.PackageInstallerUtils;
-import news.androidtv.tvapprepo.utils.ShortcutPostTask;
 import tv.puppetmaster.tinydl.PackageInstaller;
 
 public class MainFragment extends BrowseFragment {
     private static final String TAG = MainFragment.class.getSimpleName();
-    private static final boolean DEBUG_SHOW_APKS = true;
 
     private static final int BACKGROUND_UPDATE_DELAY = 300;
 
@@ -335,19 +314,7 @@ public class MainFragment extends BrowseFragment {
                     new SettingOption.OnClickListener() {
                         @Override
                         public void onClick() {
-                            new MaterialDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
-                                    .title(R.string.generate_web_bookmark)
-                                    .customView(R.layout.dialog_web_bookmark, false)
-                                    .onNegative(new MaterialDialog.SingleButtonCallback() {
-                                        @Override
-                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                            String tag = ((EditText) dialog.getCustomView().findViewById(R.id.tag)).getText().toString();
-
-                                            Toast.makeText(getActivity(), R.string.starting_download, Toast.LENGTH_SHORT).show();
-                                        }
-                                    })
-                                    .positiveText(R.string.generate_shortcut)
-                                    .show();
+                            ShortcutGeneratorDialogs.initWebBookmarkDialog(getActivity());
                         }
                     }
             ));
@@ -467,7 +434,7 @@ public class MainFragment extends BrowseFragment {
                             new MaterialDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.dialog_theme))
                                     .title(R.string.sideloadtag)
                                     .customView(R.layout.dialog_sideload_tag, false)
-                                    .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                    .onPositive(new MaterialDialog.SingleButtonCallback() {
                                         @Override
                                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                             String tag = ((EditText) dialog.getCustomView().findViewById(R.id.tag)).getText().toString();

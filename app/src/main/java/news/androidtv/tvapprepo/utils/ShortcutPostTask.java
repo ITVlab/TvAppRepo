@@ -54,12 +54,14 @@ public class ShortcutPostTask {
     private static final String TAG = ShortcutPostTask.class.getSimpleName();
 
     private static final String SUBMISSION_URL =
-            "http://atvlauncher.trekgonewild.de/index_test.php";
+            "http://atvlauncher.trekgonewild.de/index_tvapprepo.php";
     private static final String FORM_APP_NAME = "app_name";
     private static final String FORM_APP_PACKAGE = "app_package";
     private static final String FORM_APP_CATEGORY = "app_category";
     private static final String FORM_APP_LOGO = "app_logo";
     private static final String FORM_APP_BANNER = "app_banner";
+    private static final String FORM_UNIQUE_PACKAGE_NAME = "unique";
+    private static final String FORM_INTENT_URI = "app_intent";
     private static final String FORM_JSON = "json";
     public static final String CATEGORY_GAMES = "games";
     public static final String CATEGORY_APPS = "apps";
@@ -94,12 +96,23 @@ public class ShortcutPostTask {
             @Override
             protected Map<String,String> getParams(){
                 Map<String,String> params = new HashMap<>();
-                params.put(FORM_APP_NAME, app.activityInfo.loadLabel(context.getPackageManager()).toString());
-                params.put(FORM_APP_PACKAGE, app.activityInfo.applicationInfo.packageName);
-                params.put(FORM_APP_CATEGORY, CATEGORY_APPS);
+                if (app != null) {
+                    params.put(FORM_APP_NAME, app.activityInfo.loadLabel(context.getPackageManager()).toString());
+                    params.put(FORM_APP_PACKAGE, app.activityInfo.applicationInfo.packageName);
+                } else if (!options.getCustomLabel().isEmpty()) {
+                    params.put(FORM_APP_NAME, options.getCustomLabel());
+                    params.put(FORM_APP_PACKAGE, "news.androidtv.tvapprepo"); // Use our own package name
+                    options.setUniquePackageName(true); // Force to unique.
+                }
                 if (!options.getCategory().isEmpty()) {
                     params.put(FORM_APP_CATEGORY, options.getCategory());
+                } else {
+                    params.put(FORM_APP_CATEGORY, CATEGORY_APPS);
                 }
+                if (!options.getIntentUri().isEmpty()) {
+                    params.put(FORM_INTENT_URI, options.getIntentUri());
+                }
+                params.put(FORM_UNIQUE_PACKAGE_NAME, options.isUnique()+"");
                 params.put(FORM_JSON, "true");
                 return params;
             }
@@ -109,10 +122,15 @@ public class ShortcutPostTask {
                 Map<String, DataPart> params = new HashMap<>();
                 // file name could found file base or direct access from real path
                 // for now just get bitmap data from ImageView
-                params.put(FORM_APP_LOGO, new DataPart("file_avatar.png",
-                        VolleyMultipartRequest.getFileDataFromDrawable(context,
-                                app.activityInfo.loadIcon(context.getPackageManager())),
-                                "image/png"));
+                if (app != null) {
+                    params.put(FORM_APP_LOGO, new DataPart("file_avatar.png",
+                            VolleyMultipartRequest.getFileDataFromDrawable(context,
+                                    app.activityInfo.loadIcon(context.getPackageManager())),
+                            "image/png"));
+                } else if (options.getIcon() != null) {
+                    params.put(FORM_APP_LOGO, new DataPart("file_avatar.png", options.getIcon(),
+                            "image/png"));
+                }
                 if (options.getBanner() != null) {
                     params.put(FORM_APP_BANNER, new DataPart("file_avatar.png", options.getBanner(),
                             "image/png"));

@@ -39,7 +39,6 @@ public class GenerateShortcutHelper {
     private static final String KEY_DOWNLOAD_URL = "download_link";
 
     public static void begin(final Activity activity, final ResolveInfo resolveInfo) {
-
         new AlertDialog.Builder(new ContextThemeWrapper(activity, R.style.dialog_theme))
                 .setTitle(activity.getString(R.string.title_shortcut_generator,
                         resolveInfo.activityInfo.applicationInfo.loadLabel(activity.getPackageManager())))
@@ -61,24 +60,53 @@ public class GenerateShortcutHelper {
                 .show();
     }
 
+    public static void begin(final Activity activity, final String label, final AdvancedOptions options) {
+        new AlertDialog.Builder(new ContextThemeWrapper(activity, R.style.dialog_theme))
+                .setTitle(activity.getString(R.string.title_shortcut_generator, label))
+                .setMessage(R.string.shortcut_generator_info)
+                .setPositiveButton(R.string.create_shortcut, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        generateShortcut(activity, null, options);
+                    }
+                })
+                .setNeutralButton(R.string.advanced, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Open a new dialog
+                        openAdvancedOptions(activity, null, options);
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
     private static void openAdvancedOptions(final Activity activity, final ResolveInfo resolveInfo) {
+        openAdvancedOptions(activity, resolveInfo, null);
+    }
+
+    private static void openAdvancedOptions(final Activity activity, final ResolveInfo resolveInfo, AdvancedOptions options) {
         final AlertDialog dialog = new AlertDialog.Builder(new ContextThemeWrapper(activity, R.style.dialog_theme))
                 .setTitle(R.string.advanced_options)
                 .setView(R.layout.dialog_app_shortcut_editor)
                 .setNegativeButton(R.string.cancel, null)
                 .create();
+
+        if (options == null) {
+            options = new AdvancedOptions(activity);
+        }
+        final AdvancedOptions finalOptions = options;
         dialog.setButton(Dialog.BUTTON_POSITIVE,
                 activity.getString(R.string.create_shortcut),
                 new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int which) {
                 View editor = dialog.getWindow().getDecorView();
-                AdvancedOptions options = new AdvancedOptions(activity);
                 String bannerUrl =
                         ((EditText) editor.findViewById(R.id.edit_banner)).getText().toString();
                 boolean isGame = ((Switch) editor.findViewById(R.id.switch_isgame)).isChecked();
-                options.setBannerUrl(bannerUrl).setIsGame(isGame);
-                generateShortcut(activity, resolveInfo, options);
+                finalOptions.setBannerUrl(bannerUrl).setIsGame(isGame);
+                generateShortcut(activity, resolveInfo, finalOptions);
             }
         });
         dialog.show();
@@ -88,6 +116,7 @@ public class GenerateShortcutHelper {
         JSONObject data = null;
         try {
             data = new JSONObject(new String(response.data));
+            Log.d(TAG, data.toString());
             if (data.getBoolean(KEY_BUILD_STATUS)) {
                 String downloadLink = data.getJSONObject(KEY_APP_OBJ).getString(KEY_DOWNLOAD_URL);
                 ApkDownloadHelper apkDownloadHelper = new ApkDownloadHelper(activity);
@@ -95,19 +124,23 @@ public class GenerateShortcutHelper {
                 if (activity == null) {
                     throw new NullPointerException("Activity variable doesn't exist");
                 }
-                apkDownloadHelper.startDownload(downloadLink,
-                        ((ResolveInfo) item).activityInfo.applicationInfo
-                                .loadLabel(activity.getPackageManager()).toString());
+                apkDownloadHelper.startDownload(downloadLink);
             } else {
                 Toast.makeText(activity, R.string.err_build_failed, Toast.LENGTH_SHORT).show();
             }
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (NullPointerException e) {
-            throw new NullPointerException(e.getMessage() +
-                    "\nSomething odd is happening for " +
-                    ((ResolveInfo) item).activityInfo.packageName
-                    + "\n" + data.toString());
+            if (item instanceof ResolveInfo) {
+                throw new NullPointerException(e.getMessage() +
+                        "\nSomething odd is happening for " +
+                        ((ResolveInfo) item).activityInfo.packageName
+                        + "\n" + data.toString());
+            } else {
+                throw new NullPointerException(e.getMessage() +
+                        "\nSomething odd is happening"
+                        + "\n" + data.toString());
+            }
         }
     }
 

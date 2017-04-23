@@ -17,6 +17,6 @@
         android:layout_marginLeft="32dp"
         android:layout_marginRight="32dp"
         android:id="@+id/tag"
-        android:inputType="textCapCharacters|textShortMessage"
+        android:inputType="textUri"
         android:hint="http://www.example.com" />
 </LinearLayout>

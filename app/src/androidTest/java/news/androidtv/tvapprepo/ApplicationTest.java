@@ -2,10 +2,12 @@ package news.androidtv.tvapprepo;
 
 import android.app.Application;
 import android.content.ComponentName;
+import android.content.Intent;
 import android.test.ApplicationTestCase;
 import android.util.Log;
 
 import java.io.File;
+import java.net.URISyntaxException;
 
 import dalvik.annotation.TestTargetClass;
 import news.androidtv.tvapprepo.intents.IntentUriGenerator;
@@ -41,5 +43,10 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         String actual = IntentUriGenerator.generateVideoPlayback(new File("/storage/emulated/0/Download/com.felkertech.n.cumulustv.test.apk"));
         Log.d(TAG, actual);
         assertEquals(expected, actual);
+    }
+
+    public void testOpenGoogle() throws URISyntaxException {
+        String string = "intent:#Intent;component=news.androidtv.tvapprepo/.activities.SettingsActivity;end";
+        getContext().startActivity(Intent.parseUri(string, Intent.URI_INTENT_SCHEME));
     }
 }
