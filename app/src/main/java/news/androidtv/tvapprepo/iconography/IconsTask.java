@@ -5,8 +5,8 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
+import android.graphics.drawable.Drawable;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -29,6 +29,13 @@ import java.util.List;
  * We need to remove the "ComponentInfo" from that attribute.
  * ComponentInfo{com.android.browser/com.android.browser.BrowserActivity}
  *               ^ (14)                                                ^ (-1)
+ *
+ *
+ * For some additional references:
+ *      * https://github.com/iamareebjamal/scratch_icon_pack_source/blob/master/app/src/main/res/xml/appfilter.xml
+ *      * http://stackoverflow.com/questions/24937890/using-icon-packs-in-my-app
+ *      * https://github.com/CyanogenMod/android_packages_apps_Trebuchet/
+ *      * https://github.com/googlesamples/androidtv-sample-inputs/blob/master/app/src/main/res/raw/rich_tv_input_xmltv_feed.xml
  */
 
 public class IconsTask {
@@ -46,12 +53,31 @@ public class IconsTask {
                     if (resourceParser.getName().equals("item")) {
                         // Get properties
                         boolean validApp = false;
+                        String drawableName = "";
+                        boolean banner = false;
                         for (int i = 0; i < resourceParser.getAttributeCount(); i++) {
                             String attr = resourceParser.getAttributeName(i);
                             String value = resourceParser.getAttributeValue(i);
 
-                            if (attr.equals("component") && value.substring(14, value.length() - 1).equals(filter.flattenToString())) {
+                            if (attr.equals("component") &&
+                                    value.substring(14, value.length() - 1).equals(filter.flattenToString())) {
                                 validApp = true;
+                            } else if (attr.equals("drawable")) {
+                                drawableName = value;
+                            } else if (attr.equals("banner")) {
+                                banner = value.toLowerCase().equals("true");
+                            }
+
+                            if (i + 1 == resourceParser.getAttributeCount()) {
+                                // Last element
+                                if (validApp) {
+                                    int drawableId = activity.getResources().getIdentifier(drawableName, "drawable", app.activityInfo.applicationInfo.packageName);
+                                    Drawable icon = activity.getResources().getDrawable(drawableId);
+                                    iconList.add(new PackedIcon(icon, banner));
+                                }
+                                validApp = false;
+                                drawableName = "";
+                                banner = false;
                             }
                         }
                     }
@@ -59,6 +85,7 @@ public class IconsTask {
             } catch (XmlPullParserException | IOException e) {
                 e.printStackTrace();
             }
+            iconsReceivedCallback.onIcons(iconList.toArray(new PackedIcon[iconList.size()]));
         }
     }
 
