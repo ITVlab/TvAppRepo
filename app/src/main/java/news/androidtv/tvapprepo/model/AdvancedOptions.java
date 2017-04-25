@@ -5,6 +5,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.bumptech.glide.Glide;
 
@@ -19,7 +21,7 @@ import news.androidtv.tvapprepo.utils.ShortcutPostTask;
 /**
  * Created by Nick on 3/20/2017. A model for storing advanced options in generating shortcuts.
  */
-public class AdvancedOptions {
+public class AdvancedOptions implements Parcelable {
     private volatile int mReady = 0;
     private String mCategory = "";
     private String mIconUrl = "";
@@ -204,6 +206,55 @@ public class AdvancedOptions {
             e.printStackTrace();
         }
         return options;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mCustomLabel);
+        dest.writeString(mCategory);
+        dest.writeString(mIconUrl);
+        dest.writeString(mBannerUrl);
+        dest.writeByte((byte) (mUnique ? 1 : 0));
+        dest.writeString(mIntentUri);
+        if (mIconData == null) {
+            mIconData = new byte[0];
+        }
+        if (mBannerData == null) {
+            mBannerData = new byte[0];
+        }
+        dest.writeInt(mIconData.length);
+        dest.writeByteArray(mIconData);
+        dest.writeInt(mBannerData.length);
+        dest.writeByteArray(mBannerData);
+    }
+
+    public static final Parcelable.Creator<AdvancedOptions> CREATOR
+            = new Parcelable.Creator<AdvancedOptions>() {
+        public AdvancedOptions createFromParcel(Parcel in) {
+            return new AdvancedOptions(in);
+        }
+
+        public AdvancedOptions[] newArray(int size) {
+            return new AdvancedOptions[size];
+        }
+    };
+
+    private AdvancedOptions(Parcel in) {
+        mCustomLabel = in.readString();
+        mCategory = in.readString();
+        mIconUrl = in.readString();
+        mBannerUrl = in.readString();
+        mUnique = in.readByte() == 1;
+        mIntentUri = in.readString();
+        mIconData = new byte[in.readInt()];
+        in.readByteArray(mIconData);
+        mBannerData = new byte[in.readInt()];
+        in.readByteArray(mBannerData);
     }
 
     private interface GlideCallback {

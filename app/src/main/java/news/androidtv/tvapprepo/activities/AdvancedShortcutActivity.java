@@ -79,8 +79,7 @@ public class AdvancedShortcutActivity extends Activity {
             resolveInfo = getIntent().getParcelableExtra(EXTRA_RESOLVE_INFO);
         }
         if (getIntent().hasExtra(EXTRA_ADVANCED_OPTIONS)) {
-            advancedOptions = AdvancedOptions.deserialize(this,
-                    getIntent().getStringExtra(EXTRA_ADVANCED_OPTIONS));
+            advancedOptions = getIntent().getParcelableExtra(EXTRA_ADVANCED_OPTIONS);
         }
 
         if (advancedOptions == null) {

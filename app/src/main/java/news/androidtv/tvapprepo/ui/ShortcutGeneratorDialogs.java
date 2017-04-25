@@ -3,6 +3,7 @@ package news.androidtv.tvapprepo.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -20,6 +21,8 @@ import news.androidtv.tvapprepo.utils.GenerateShortcutHelper;
  */
 
 public class ShortcutGeneratorDialogs {
+    private static final String TAG = ShortcutGeneratorDialogs.class.getSimpleName();
+
     public static void initWebBookmarkDialog(final Activity activity) {
         new MaterialDialog.Builder(new ContextThemeWrapper(activity, R.style.dialog_theme))
                 .title(R.string.generate_web_bookmark)
@@ -32,6 +35,7 @@ public class ShortcutGeneratorDialogs {
                             tag = "http://" + tag;
                         }
                         String label = tag.replaceAll("(http://)|(https://)", "");
+                        Log.d(TAG, IntentUriGenerator.generateWebBookmark(tag));
                         AdvancedOptions options = new AdvancedOptions(activity)
                                 .setIntentUri(IntentUriGenerator.generateWebBookmark(tag))
                                 .setIconUrl("https://raw.githubusercontent.com/ITVlab/TvAppRepo/master/promo/graphics/icon.png") // TODO Replace icon url

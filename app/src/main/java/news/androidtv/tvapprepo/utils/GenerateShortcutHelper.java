@@ -97,89 +97,9 @@ public class GenerateShortcutHelper {
         Intent editorPanel = new Intent(activity, AdvancedShortcutActivity.class);
         editorPanel.putExtra(AdvancedShortcutActivity.EXTRA_RESOLVE_INFO, resolveInfo);
         if (options != null) {
-            editorPanel.putExtra(AdvancedShortcutActivity.EXTRA_ADVANCED_OPTIONS, options.serialize());
+            editorPanel.putExtra(AdvancedShortcutActivity.EXTRA_ADVANCED_OPTIONS, options);
         }
         activity.startActivity(editorPanel);
-    }
-    private static void openAdvancedOptions2(final Activity activity, final ResolveInfo resolveInfo, AdvancedOptions options) {
-        final AlertDialog dialog = new AlertDialog.Builder(new ContextThemeWrapper(activity, R.style.dialog_theme))
-                .setTitle(R.string.advanced_options)
-                .setView(R.layout.dialog_app_shortcut_editor)
-                .setNegativeButton(R.string.cancel, null)
-                .create();
-
-        if (options == null) {
-            options = new AdvancedOptions(activity);
-        }
-        final AdvancedOptions[] finalOptions = {options};
-        dialog.setButton(Dialog.BUTTON_POSITIVE,
-                activity.getString(R.string.create_shortcut),
-                new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int which) {
-                View editor = dialog.getWindow().getDecorView();
-                boolean isGame = ((Switch) editor.findViewById(R.id.switch_isgame)).isChecked();
-                finalOptions[0].setIsGame(isGame);
-                generateShortcut(activity, resolveInfo, finalOptions[0]);
-            }
-        });
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialogInterface) {
-                View layout = dialog.getWindow().getDecorView();
-                layout.findViewById(R.id.change_banner).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // Lookup for the app icon
-                        if (resolveInfo != null) {
-                            IconsTask.getIconsForComponentName(activity,
-                                    new ComponentName(resolveInfo.activityInfo.packageName, resolveInfo.activityInfo.name),
-                                    new IconsTask.IconsReceivedCallback() {
-                                @Override
-                                public void onIcons(PackedIcon[] icons) {
-                                    Log.d(TAG, icons.length + "<<<");
-                                    // Show dialog of all icons for the user to select (or let them do their own)
-                                    final AlertDialog iconDialog = new AlertDialog.Builder(new ContextThemeWrapper(activity, R.style.dialog_theme))
-                                            .setTitle("Select Custom Iconography")
-                                            .setView(R.layout.dialog_custom_iconography)
-                                            .create();
-                                    iconDialog.setButton(AlertDialog.BUTTON_POSITIVE, activity.getString(R.string.ok), new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            String bannerUrl =
-                                                    ((EditText) iconDialog.getWindow().getDecorView().findViewById(R.id.edit_banner)).getText().toString();
-                                            finalOptions[0].setBannerUrl(bannerUrl);
-                                        }
-                                    });
-                                    iconDialog.show();
-                                    LinearLayout iconDialogLayout = (LinearLayout) iconDialog.getWindow().getDecorView().findViewById(R.id.icon_list);
-                                    for (final PackedIcon icon : icons) {
-                                        ImageButton imageButton = new ImageButton(activity);
-                                        imageButton.setImageDrawable(icon.icon);
-                                        imageButton.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                if (icon.isBanner) {
-                                                    finalOptions[0].setBannerBitmap(icon.getBitmap());
-                                                } else {
-                                                    finalOptions[0].setIconBitmap(icon.getBitmap());
-                                                }
-                                                Log.d(TAG, finalOptions[0].toString());
-                                                iconDialog.dismiss();
-                                            }
-                                        });
-                                        iconDialogLayout.addView(imageButton);
-                                    }
-                                }
-                            });
-                        } else {
-                            Toast.makeText(activity, "Cannot set banner of non-app yet", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-            }
-        });
-        dialog.show();
     }
 
     private static void downloadShortcutApk(Activity activity, NetworkResponse response, Object item) {
