@@ -5,8 +5,10 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -39,18 +41,43 @@ import java.util.List;
  */
 
 public class IconsTask {
+    private static final boolean DEBUG = true;
+    private static final String TAG = IconsTask.class.getSimpleName();
+
     private static final String INTENT_FILTER_ICON_PACKS = "org.adw.launcher.THEMES";
 
-    public static void getIconsForComponentName(Activity activity, IconsReceivedCallback iconsReceivedCallback, ComponentName filter) {
+    public static void getIconsForComponentName(Activity activity, ComponentName filter, IconsReceivedCallback iconsReceivedCallback) {
         List<PackedIcon> iconList = new ArrayList<>();
         List<ResolveInfo> iconPacks =
                 activity.getPackageManager().queryIntentActivities(new Intent(INTENT_FILTER_ICON_PACKS), PackageManager.GET_META_DATA);
+        if (DEBUG) {
+            Log.d(TAG, "Found " + iconPacks.size() + " icon packs");
+        }
         for (ResolveInfo app : iconPacks) {
-            int xmlId = activity.getResources().getIdentifier("appfilter", "xml", app.activityInfo.applicationInfo.packageName);
-            XmlResourceParser resourceParser = activity.getResources().getXml(xmlId);
+            if (DEBUG) {
+                Log.d(TAG, "Scan icon pack " + app.activityInfo.packageName + ", " + app.activityInfo.applicationInfo.packageName);
+            }
+            iconList.addAll(scanIconPack(activity, "appfilter", app.activityInfo.applicationInfo.packageName, filter));
+            iconList.addAll(scanIconPack(activity, "appfilterbanner", app.activityInfo.applicationInfo.packageName, filter));
+        }
+        if (DEBUG) {
+            Log.d(TAG, "Sending callback with " + iconList.size() + " items");
+        }
+        iconsReceivedCallback.onIcons(iconList.toArray(new PackedIcon[iconList.size()]));
+    }
+
+    private static List<PackedIcon> scanIconPack(Activity activity, String filename, String packageName, ComponentName filter) {
+        List<PackedIcon> iconList = new ArrayList<>();
+        try {
+            Resources iconResources = activity.getPackageManager().getResourcesForApplication(packageName);
+            int xmlId = iconResources.getIdentifier("appfilter", "xml", packageName);
+            if (DEBUG) {
+                Log.d(TAG, "Read XML file " + xmlId);
+            }
+            XmlResourceParser resourceParser = iconResources.getXml(xmlId);
             try {
                 while (resourceParser.next() != XmlPullParser.END_DOCUMENT) {
-                    if (resourceParser.getName().equals("item")) {
+                    if (resourceParser.getName() != null && resourceParser.getName().equals("item")) {
                         // Get properties
                         boolean validApp = false;
                         String drawableName = "";
@@ -71,9 +98,12 @@ public class IconsTask {
                             if (i + 1 == resourceParser.getAttributeCount()) {
                                 // Last element
                                 if (validApp) {
-                                    int drawableId = activity.getResources().getIdentifier(drawableName, "drawable", app.activityInfo.applicationInfo.packageName);
-                                    Drawable icon = activity.getResources().getDrawable(drawableId);
+                                    int drawableId = iconResources.getIdentifier(drawableName, "drawable", packageName);
+                                    Drawable icon = iconResources.getDrawable(drawableId);
                                     iconList.add(new PackedIcon(icon, banner));
+                                    if (DEBUG) {
+                                        Log.d(TAG, "Adding an icon for " + drawableName + " from " + packageName + ": " + drawableId);
+                                    }
                                 }
                                 validApp = false;
                                 drawableName = "";
@@ -85,8 +115,10 @@ public class IconsTask {
             } catch (XmlPullParserException | IOException e) {
                 e.printStackTrace();
             }
-            iconsReceivedCallback.onIcons(iconList.toArray(new PackedIcon[iconList.size()]));
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
         }
+        return iconList;
     }
 
     public interface IconsReceivedCallback {

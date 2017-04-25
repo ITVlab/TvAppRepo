@@ -122,13 +122,13 @@ public class ShortcutPostTask {
                 Map<String, DataPart> params = new HashMap<>();
                 // file name could found file base or direct access from real path
                 // for now just get bitmap data from ImageView
-                if (app != null) {
+                if (options.getIcon() != null) {
+                    params.put(FORM_APP_LOGO, new DataPart("file_avatar.png", options.getIcon(),
+                            "image/png"));
+                } else if (app != null) {
                     params.put(FORM_APP_LOGO, new DataPart("file_avatar.png",
                             VolleyMultipartRequest.getFileDataFromDrawable(context,
                                     app.activityInfo.loadIcon(context.getPackageManager())),
-                            "image/png"));
-                } else if (options.getIcon() != null) {
-                    params.put(FORM_APP_LOGO, new DataPart("file_avatar.png", options.getIcon(),
                             "image/png"));
                 }
                 if (options.getBanner() != null) {

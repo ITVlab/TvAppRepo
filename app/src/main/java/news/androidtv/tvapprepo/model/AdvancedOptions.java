@@ -90,6 +90,22 @@ public class AdvancedOptions {
         return this;
     }
 
+    public AdvancedOptions setBannerBitmap(Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] results = stream.toByteArray();
+        mBannerData = results;
+        return this;
+    }
+
+    public AdvancedOptions setIconBitmap(Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] results = stream.toByteArray();
+        mIconData = results;
+        return this;
+    }
+
     public boolean isReady() {
         return mReady == 0;
     }
@@ -146,6 +162,13 @@ public class AdvancedOptions {
                 }
             }
         }).start();
+    }
+
+    @Override
+    public String toString() {
+        return "Name=" + mCustomLabel + ", category=" + mCategory + ", iconUrl=" + mIconUrl +
+                ", bannerUrl=" + mBannerUrl + ", iconData=" + (mIconData != null) +
+                ", bannerData=" + (mBannerData != null);
     }
 
     private interface GlideCallback {

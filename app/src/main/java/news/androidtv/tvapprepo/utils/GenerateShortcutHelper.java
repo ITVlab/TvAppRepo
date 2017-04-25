@@ -2,15 +2,19 @@ package news.androidtv.tvapprepo.utils;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.pm.ResolveInfo;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.app.AlertDialog;
+import android.text.Layout;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -26,6 +30,8 @@ import org.json.JSONObject;
 
 import news.androidtv.tvapprepo.R;
 import news.androidtv.tvapprepo.download.ApkDownloadHelper;
+import news.androidtv.tvapprepo.iconography.IconsTask;
+import news.androidtv.tvapprepo.iconography.PackedIcon;
 import news.androidtv.tvapprepo.model.AdvancedOptions;
 
 /**
@@ -95,18 +101,72 @@ public class GenerateShortcutHelper {
         if (options == null) {
             options = new AdvancedOptions(activity);
         }
-        final AdvancedOptions finalOptions = options;
+        final AdvancedOptions[] finalOptions = {options};
         dialog.setButton(Dialog.BUTTON_POSITIVE,
                 activity.getString(R.string.create_shortcut),
                 new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int which) {
                 View editor = dialog.getWindow().getDecorView();
-                String bannerUrl =
-                        ((EditText) editor.findViewById(R.id.edit_banner)).getText().toString();
                 boolean isGame = ((Switch) editor.findViewById(R.id.switch_isgame)).isChecked();
-                finalOptions.setBannerUrl(bannerUrl).setIsGame(isGame);
-                generateShortcut(activity, resolveInfo, finalOptions);
+                finalOptions[0].setIsGame(isGame);
+                generateShortcut(activity, resolveInfo, finalOptions[0]);
+            }
+        });
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                View layout = dialog.getWindow().getDecorView();
+                layout.findViewById(R.id.change_banner).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // Lookup for the app icon
+                        if (resolveInfo != null) {
+                            IconsTask.getIconsForComponentName(activity,
+                                    new ComponentName(resolveInfo.activityInfo.packageName, resolveInfo.activityInfo.name),
+                                    new IconsTask.IconsReceivedCallback() {
+                                @Override
+                                public void onIcons(PackedIcon[] icons) {
+                                    Log.d(TAG, icons.length + "<<<");
+                                    // Show dialog of all icons for the user to select (or let them do their own)
+                                    final AlertDialog iconDialog = new AlertDialog.Builder(new ContextThemeWrapper(activity, R.style.dialog_theme))
+                                            .setTitle("Select Custom Iconography")
+                                            .setView(R.layout.dialog_custom_iconography)
+                                            .create();
+                                    iconDialog.setButton(AlertDialog.BUTTON_POSITIVE, activity.getString(R.string.ok), new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            String bannerUrl =
+                                                    ((EditText) iconDialog.getWindow().getDecorView().findViewById(R.id.edit_banner)).getText().toString();
+                                            finalOptions[0].setBannerUrl(bannerUrl);
+                                        }
+                                    });
+                                    iconDialog.show();
+                                    LinearLayout iconDialogLayout = (LinearLayout) iconDialog.getWindow().getDecorView().findViewById(R.id.icon_list);
+                                    for (final PackedIcon icon : icons) {
+                                        ImageButton imageButton = new ImageButton(activity);
+                                        imageButton.setImageDrawable(icon.icon);
+                                        imageButton.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                if (icon.isBanner) {
+                                                    finalOptions[0].setBannerBitmap(icon.getBitmap());
+                                                } else {
+                                                    finalOptions[0].setIconBitmap(icon.getBitmap());
+                                                }
+                                                Log.d(TAG, finalOptions[0].toString());
+                                                iconDialog.dismiss();
+                                            }
+                                        });
+                                        iconDialogLayout.addView(imageButton);
+                                    }
+                                }
+                            });
+                        } else {
+                            Toast.makeText(activity, "Cannot set banner of non-app yet", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
         });
         dialog.show();

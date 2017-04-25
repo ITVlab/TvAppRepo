@@ -19,6 +19,6 @@
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:backgroundDimEnabled">true</item>
-        <item name="android:colorPrimary" tools:targetApi="lollipop">@color/fastlane_background</item>
+        <item name="android:colorPrimary" tools:targetApi="lollipop">@color/primary</item>
     </style>
 </resources>
