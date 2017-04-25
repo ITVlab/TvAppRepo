@@ -1,11 +1,15 @@
 package news.androidtv.tvapprepo.model;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
 
 import com.bumptech.glide.Glide;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.util.concurrent.ExecutionException;
@@ -169,6 +173,37 @@ public class AdvancedOptions {
         return "Name=" + mCustomLabel + ", category=" + mCategory + ", iconUrl=" + mIconUrl +
                 ", bannerUrl=" + mBannerUrl + ", iconData=" + (mIconData != null) +
                 ", bannerData=" + (mBannerData != null);
+    }
+
+    public String serialize() {
+        JSONObject object = new JSONObject();
+        try {
+            object.put("customLabel", mCustomLabel);
+            object.put("category", mCategory);
+            object.put("iconUrl", mIconUrl);
+            object.put("bannerUrl", mBannerUrl);
+            object.put("isUnique", mUnique);
+            object.put("intentUri", mIntentUri);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return object.toString();
+    }
+
+    public static AdvancedOptions deserialize(Activity activity, String serialization) {
+        AdvancedOptions options = new AdvancedOptions(activity);
+        try {
+            JSONObject object = new JSONObject(serialization);
+            options.setCustomLabel(object.optString("customLabel"));
+            options.mCategory = object.optString("category");
+            options.setIconUrl(object.optString("iconUrl"));
+            options.setBannerUrl(object.optString("bannerUrl"));
+            options.setUniquePackageName(object.optBoolean("isUnique"));
+            options.setIntentUri(object.optString("intentUri"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return options;
     }
 
     private interface GlideCallback {

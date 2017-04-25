@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+    <translate
+        android:duration="@integer/side_panel_anim_duration_ms"
+        android:fromXDelta="10%"
+        android:interpolator="@android:interpolator/linear_out_slow_in"
+        android:toXDelta="0%" />
+    <alpha
+        android:duration="@integer/side_panel_anim_duration_ms"
+        android:fromAlpha="0.0"
+        android:interpolator="@android:interpolator/linear_out_slow_in"
+        android:toAlpha="1.0" />
+</set>

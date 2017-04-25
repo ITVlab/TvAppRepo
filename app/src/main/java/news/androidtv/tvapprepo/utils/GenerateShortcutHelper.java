@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.os.Handler;
 import android.os.Looper;
@@ -29,6 +30,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import news.androidtv.tvapprepo.R;
+import news.androidtv.tvapprepo.activities.AdvancedShortcutActivity;
 import news.androidtv.tvapprepo.download.ApkDownloadHelper;
 import news.androidtv.tvapprepo.iconography.IconsTask;
 import news.androidtv.tvapprepo.iconography.PackedIcon;
@@ -92,6 +94,14 @@ public class GenerateShortcutHelper {
     }
 
     private static void openAdvancedOptions(final Activity activity, final ResolveInfo resolveInfo, AdvancedOptions options) {
+        Intent editorPanel = new Intent(activity, AdvancedShortcutActivity.class);
+        editorPanel.putExtra(AdvancedShortcutActivity.EXTRA_RESOLVE_INFO, resolveInfo);
+        if (options != null) {
+            editorPanel.putExtra(AdvancedShortcutActivity.EXTRA_ADVANCED_OPTIONS, options.serialize());
+        }
+        activity.startActivity(editorPanel);
+    }
+    private static void openAdvancedOptions2(final Activity activity, final ResolveInfo resolveInfo, AdvancedOptions options) {
         final AlertDialog dialog = new AlertDialog.Builder(new ContextThemeWrapper(activity, R.style.dialog_theme))
                 .setTitle(R.string.advanced_options)
                 .setView(R.layout.dialog_app_shortcut_editor)
@@ -204,11 +214,11 @@ public class GenerateShortcutHelper {
         }
     }
 
-    private static void generateShortcut(final Activity activity, final ResolveInfo resolveInfo) {
+    public static void generateShortcut(final Activity activity, final ResolveInfo resolveInfo) {
         generateShortcut(activity, resolveInfo, new AdvancedOptions(activity));
     }
 
-    private static void generateShortcut(final Activity activity, final ResolveInfo resolveInfo,
+    public static void generateShortcut(final Activity activity, final ResolveInfo resolveInfo,
             final AdvancedOptions options) {
         if (!options.isReady()) {
             // Delay until we complete all web operations

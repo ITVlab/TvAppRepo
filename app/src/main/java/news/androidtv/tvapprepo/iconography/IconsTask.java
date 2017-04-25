@@ -70,9 +70,12 @@ public class IconsTask {
         List<PackedIcon> iconList = new ArrayList<>();
         try {
             Resources iconResources = activity.getPackageManager().getResourcesForApplication(packageName);
-            int xmlId = iconResources.getIdentifier("appfilter", "xml", packageName);
+            int xmlId = iconResources.getIdentifier(filename, "xml", packageName);
             if (DEBUG) {
                 Log.d(TAG, "Read XML file " + xmlId);
+            }
+            if (xmlId == 0) {
+                return iconList;
             }
             XmlResourceParser resourceParser = iconResources.getXml(xmlId);
             try {

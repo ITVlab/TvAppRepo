@@ -18,4 +18,6 @@
 
     <color name="primaryDark">#2E7D32</color>
     <color name="primary">#4CAF50</color>
+    <color name="grey100">#E0E0E0</color>
+    <color name="dark_grey">#333333</color>
 </resources>

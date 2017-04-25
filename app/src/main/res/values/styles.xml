@@ -21,4 +21,15 @@
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:colorPrimary" tools:targetApi="lollipop">@color/primary</item>
     </style>
+
+    <style name="Theme.Panel" parent="@android:style/Theme.Material.Panel">
+        <item name="android:windowElevation">@dimen/side_panel_elevation</item>
+        <item name="android:windowBackground">@color/dark_grey</item>
+        <item name="android:windowAnimationStyle">@style/side_panel_animation</item>
+    </style>
+
+    <style name="side_panel_animation">
+        <item name="android:windowEnterAnimation">@anim/side_panel_enter</item>
+        <item name="android:windowExitAnimation">@anim/side_panel_exit</item>
+    </style>
 </resources>
