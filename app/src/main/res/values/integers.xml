@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="side_panel_anim_duration_ms">500</integer>
+</resources>

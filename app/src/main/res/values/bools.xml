@@ -3,4 +3,10 @@
     <bool name="ENABLE_SIDELOADTAG">true</bool>
     <bool name="ENABLE_DOWNLOADS_ROW">true</bool>
     <bool name="ENABLE_APP_REPO">true</bool>
+    <bool name="ENABLE_RAW_INTENTS">true</bool>
+    <bool name="ENABLE_WEB_BOOKMARKS">true</bool>
+    <bool name="ENABLE_FOLDERS">false</bool>
+    <bool name="ENABLE_SETTINGS">false</bool>
+    <bool name="ENABLE_APP_DEEPLINKS">false</bool>
+    <bool name="ENABLE_FILE_URIS">false</bool>
 </resources>

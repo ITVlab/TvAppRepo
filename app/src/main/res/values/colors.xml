@@ -1,7 +1,7 @@
 <resources>
     <color name="background_gradient_start">#000000</color>
     <color name="background_gradient_end">#DDDDDD</color>
-    <color name="fastlane_background">#0096a6</color>
+    <color name="fastlane_background">#00695C</color>
     <color name="search_opaque">#ffaa3f</color>
     <color name="selected_background">#ffaa3f</color>
     <color name="detail_background">#0096a6</color>
@@ -16,6 +16,8 @@
     <color name="yellow">#EEFF41</color>
     <color name="default_background">#3d3d3d</color>
 
-    <color name="primaryDark">@color/default_background</color>
-    <color name="primary">@color/orange</color>
+    <color name="primaryDark">#2E7D32</color>
+    <color name="primary">#4CAF50</color>
+    <color name="grey100">#E0E0E0</color>
+    <color name="dark_grey">#333333</color>
 </resources>
