@@ -58,4 +58,13 @@
     <string name="err_build_failed">Build failed</string>
     <string name="err_build_failed_reason">Build failed: %1$s</string>
     <string name="msg_pls_wait">Please wait. This may take up to 20 seconds.</string>
+    <string name="generate_file_shortcut">File Link</string>
+    <string name="generate_deep_link">Activity Deep Link</string>
+    <string name="generate_folder">Generate Folder</string>
+    <string name="generate_folder_info">A folder will appear on the side of the screen with a list of apps inside. You can continue to change the apps in the folder, but the title cannot change.</string>
+    <string name="generate_settings">Shortcut to Settings</string>
+    <string name="generate_shortcut">Generate Shortcut</string>
+    <string name="generate_web_bookmark">Generate Web Bookmark</string>
+    <string name="generate_web_bookmark_info">Enter a URL and a shortcut will be created to open that in any third-party web browser.</string>
+    <string name="header_custom">Custom Shortcuts</string>
 </resources>

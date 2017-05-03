@@ -25,6 +25,9 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.reward.RewardItem;
+import com.google.android.gms.ads.reward.RewardedVideoAd;
+import com.google.android.gms.ads.reward.RewardedVideoAdListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -154,7 +157,8 @@ public class GenerateShortcutHelper {
                 R.string.msg_pls_wait,
                 Toast.LENGTH_SHORT).show();
 
-        final InterstitialAd video = showVisualAd(activity);
+        showVisualAd(activity);
+
 
         ShortcutPostTask.generateShortcut(activity,
                 resolveInfo,
@@ -200,5 +204,46 @@ public class GenerateShortcutHelper {
         });
 
         return video;
+    }
+
+    static void showVideoAd(Activity activity) {
+        final RewardedVideoAd ad = MobileAds.getRewardedVideoAdInstance(activity);
+        ad.setRewardedVideoAdListener(new RewardedVideoAdListener() {
+            @Override
+            public void onRewardedVideoAdLoaded() {
+                ad.show();
+            }
+
+            @Override
+            public void onRewardedVideoAdOpened() {
+
+            }
+
+            @Override
+            public void onRewardedVideoStarted() {
+
+            }
+
+            @Override
+            public void onRewardedVideoAdClosed() {
+
+            }
+
+            @Override
+            public void onRewarded(RewardItem rewardItem) {
+
+            }
+
+            @Override
+            public void onRewardedVideoAdLeftApplication() {
+
+            }
+
+            @Override
+            public void onRewardedVideoAdFailedToLoad(int i) {
+
+            }
+        });
+        ad.loadAd(activity.getString(R.string.reward_video_ad_unit_id), new AdRequest.Builder().build());
     }
 }

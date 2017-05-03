@@ -31,8 +31,9 @@ public class ShortcutGeneratorDialogs {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         String tag = ((EditText) dialog.getCustomView().findViewById(R.id.tag)).getText().toString();
-                        if (!tag.contains("http://") || !tag.contains("https://")) {
+                        if (!tag.contains("http://") && !tag.contains("https://")) {
                             tag = "http://" + tag;
+                            Log.w(TAG, "URL added without http...");
                         }
                         String label = tag.replaceAll("(http://)|(https://)", "");
                         Log.d(TAG, IntentUriGenerator.generateWebBookmark(tag));

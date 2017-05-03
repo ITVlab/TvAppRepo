@@ -41,7 +41,7 @@ import java.util.List;
  */
 
 public class IconsTask {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private static final String TAG = IconsTask.class.getSimpleName();
 
     private static final String INTENT_FILTER_ICON_PACKS = "org.adw.launcher.THEMES";
@@ -57,8 +57,13 @@ public class IconsTask {
             if (DEBUG) {
                 Log.d(TAG, "Scan icon pack " + app.activityInfo.packageName + ", " + app.activityInfo.applicationInfo.packageName);
             }
-            iconList.addAll(scanIconPack(activity, "appfilter", app.activityInfo.applicationInfo.packageName, filter));
-            iconList.addAll(scanIconPack(activity, "appfilterbanner", app.activityInfo.applicationInfo.packageName, filter));
+            try {
+                iconList.addAll(scanIconPack(activity, "appfilter", app.activityInfo.applicationInfo.packageName, filter));
+                iconList.addAll(scanIconPack(activity, "appfilterbanner", app.activityInfo.applicationInfo.packageName, filter));
+            } catch (StringIndexOutOfBoundsException e) {
+                // Add more debug info
+                throw new RuntimeException(e.getClass().getSimpleName() + ": " + e.getMessage() + ", " + filter + ", " + app.activityInfo.applicationInfo.packageName);
+            }
         }
         if (DEBUG) {
             Log.d(TAG, "Sending callback with " + iconList.size() + " items");
@@ -89,7 +94,10 @@ public class IconsTask {
                             String attr = resourceParser.getAttributeName(i);
                             String value = resourceParser.getAttributeValue(i);
 
-                            if (attr.equals("component") &&
+                            if (attr.equals("component") && filter == null) {
+                                validApp = true; // If not an app, choose ANY icon
+                            }
+                            else if (attr.equals("component") &&
                                     value.substring(14, value.length() - 1).equals(filter.flattenToString())) {
                                 validApp = true;
                             } else if (attr.equals("drawable")) {

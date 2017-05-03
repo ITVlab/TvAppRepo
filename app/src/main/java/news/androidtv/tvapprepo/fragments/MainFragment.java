@@ -50,6 +50,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import io.fabric.sdk.android.Fabric;
 import news.androidtv.tvapprepo.R;
 import news.androidtv.tvapprepo.Utils;
 import news.androidtv.tvapprepo.activities.DetailsActivity;
@@ -237,17 +238,22 @@ public class MainFragment extends BrowseFragment {
         downloadedFilesList = getApkDownloads(downloadedFilesList, myDownloads.listFiles());
 
         // Now sort
-        Collections.sort(downloadedFilesList, new Comparator<File>() {
-            @Override
-            public int compare(File file, File t1) {
-                try {
-                    return (int) (file.lastModified() - t1.lastModified());
-                } catch (IllegalArgumentException e) {
-                    throw new IllegalArgumentException(e.getMessage() + " with " +
-                            file.lastModified() + " & " + t1.lastModified());
+        try {
+            Collections.sort(downloadedFilesList, new Comparator<File>() {
+                @Override
+                public int compare(File file, File t1) {
+                    try {
+                        return (int) (file.lastModified() - t1.lastModified());
+                    } catch (IllegalArgumentException e) {
+                        throw new IllegalArgumentException(e.getMessage() + " with " +
+                                file.lastModified() + " & " + t1.lastModified());
+                    }
                 }
-            }
-        });
+            });
+        } catch (IllegalArgumentException e) {
+            // Sorting fail. Issue w/ contract?
+            // We don't sort.
+        }
         downloadedFilesAdapter.addAll(0, downloadedFilesList);
         HeaderItem downloadedFilesHeader = new HeaderItem(1, getString(R.string.header_downloaded_apks));
         mRowsAdapter.add(new ListRow(downloadedFilesHeader, downloadedFilesAdapter));
@@ -283,13 +289,15 @@ public class MainFragment extends BrowseFragment {
             Intent shortcut = getActivity().getPackageManager().getLeanbackLaunchIntentForPackage(
                     "de.eye_interactive.atvl." + adjustedName
             );
-            if (shortcut != null) {
-                infoIterator.remove();
-            }
-
-            // Filter out those activities that are both launcher types
-            if (leanbackPackageNames.contains(info.activityInfo.applicationInfo.packageName)) {
-                infoIterator.remove();
+            try {
+                if (shortcut != null) {
+                    infoIterator.remove();
+                } else if (leanbackPackageNames.contains(info.activityInfo.applicationInfo.packageName)) {
+                    // Filter out those activities that are both launcher types
+                    infoIterator.remove();
+                }
+            } catch (Exception e) {
+                // Hmm...
             }
         }
         Log.d(TAG, launcherActivities.toString());

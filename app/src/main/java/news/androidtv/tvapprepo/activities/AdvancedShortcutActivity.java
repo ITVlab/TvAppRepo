@@ -44,25 +44,28 @@ public class AdvancedShortcutActivity extends Activity {
     private IconsTask.IconsReceivedCallback callback = new IconsTask.IconsReceivedCallback() {
         @Override
         public void onIcons(PackedIcon[] icons) {
-            Log.d(TAG, icons.length + "<<<");
-            // Show all icons for the user to select (or let them do their own)
-            LinearLayout iconDialogLayout = (LinearLayout) findViewById(R.id.icon_list);
-            iconDialogLayout.removeAllViews();
-            for (final PackedIcon icon : icons) {
-                ImageButton imageButton = new ImageButton(AdvancedShortcutActivity.this);
-                imageButton.setImageDrawable(icon.icon);
-                imageButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (icon.isBanner) {
-                            advancedOptions.setBannerBitmap(icon.getBitmap());
-                        } else {
-                            advancedOptions.setIconBitmap(icon.getBitmap());
+            if (getResources().getBoolean(R.bool.ENABLE_ICON_PACKS)) {
+                Log.d(TAG, icons.length + "<<<");
+                // Show all icons for the user to select (or let them do their own)
+                LinearLayout iconDialogLayout = (LinearLayout) findViewById(R.id.icon_list);
+                iconDialogLayout.requestFocus();
+                iconDialogLayout.removeAllViews();
+                for (final PackedIcon icon : icons) {
+                    ImageButton imageButton = new ImageButton(AdvancedShortcutActivity.this);
+                    imageButton.setImageDrawable(icon.icon);
+                    imageButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (icon.isBanner) {
+                                advancedOptions.setBannerBitmap(icon.getBitmap());
+                            } else {
+                                advancedOptions.setIconBitmap(icon.getBitmap());
+                            }
+                            Log.d(TAG, advancedOptions.toString());
                         }
-                        Log.d(TAG, advancedOptions.toString());
-                    }
-                });
-                iconDialogLayout.addView(imageButton);
+                    });
+                    iconDialogLayout.addView(imageButton);
+                }
             }
         }
     };

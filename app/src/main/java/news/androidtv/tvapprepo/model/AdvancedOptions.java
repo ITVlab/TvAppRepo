@@ -34,6 +34,9 @@ public class AdvancedOptions implements Parcelable {
     private Context mContext = null;
 
     public AdvancedOptions(Context context) {
+        if (context == null) {
+            throw new NullPointerException("Context cannot be null!");
+        }
         mContext = context;
     }
 
@@ -62,7 +65,7 @@ public class AdvancedOptions implements Parcelable {
 
     public AdvancedOptions setIntentUri(String intentUri) {
         if (intentUri.length() < 20 || intentUri.length() > 300) {
-            throw new StringLengthException();
+            throw new StringLengthException(intentUri);
         }
         mIntentUri = intentUri;
         return this;
@@ -262,8 +265,8 @@ public class AdvancedOptions implements Parcelable {
     }
 
     public class StringLengthException extends RuntimeException {
-        public StringLengthException() {
-            super("Intent URI length must be between 20 and 300 characters");
+        public StringLengthException(String string) {
+            super("Intent URI length must be between 20 and 300 characters: " + string);
         }
     }
 }
