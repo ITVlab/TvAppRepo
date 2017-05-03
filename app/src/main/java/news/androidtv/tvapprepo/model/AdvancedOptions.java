@@ -34,6 +34,9 @@ public class AdvancedOptions implements Parcelable {
     private Context mContext = null;
 
     public AdvancedOptions(Context context) {
+        if (context == null) {
+            throw new NullPointerException("Context cannot be null!");
+        }
         mContext = context;
     }
 

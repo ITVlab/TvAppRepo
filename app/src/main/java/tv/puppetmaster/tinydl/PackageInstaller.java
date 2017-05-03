@@ -274,15 +274,21 @@ public class PackageInstaller {
                         urls[0].substring(urls[0].lastIndexOf("/") + 1).trim().replaceAll("\\?", "")
                                 + ".apk";
             }
-            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(downloadUri));
-            request.setTitle(mActivity.getString(R.string.app_name) + ": " + downloadedFileName);
-            request.setDescription(mActivity.getString(R.string.directory) + ": " +
-                    DOWNLOADS_DIRECTORY.toString());
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
-                    downloadedFileName);
-            final DownloadManager manager =
-                    (DownloadManager) mActivity.getSystemService(Context.DOWNLOAD_SERVICE);
-            manager.enqueue(request);
+            try {
+                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(downloadUri));
+                request.setTitle(mActivity.getString(R.string.app_name) + ": " + downloadedFileName);
+                request.setDescription(mActivity.getString(R.string.directory) + ": " +
+                        DOWNLOADS_DIRECTORY.toString());
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
+                        downloadedFileName);
+                final DownloadManager manager =
+                        (DownloadManager) mActivity.getSystemService(Context.DOWNLOAD_SERVICE);
+                manager.enqueue(request);
+            } catch (Exception e) {
+                Toast.makeText(mActivity, e.getMessage(), Toast.LENGTH_SHORT).show();
+                // Tell user about an error and throw with additional debug info.
+                throw new RuntimeException(e.getMessage() + ": " + downloadedFileName + ", " + urls[0] + ", " + DOWNLOADS_DIRECTORY.toString());
+            }
             Log.i(TAG, "Download request for " + urls[0] + " enqueued");
             Log.d(TAG, "Should be saved to " + downloadedFileName);
             return -1;
