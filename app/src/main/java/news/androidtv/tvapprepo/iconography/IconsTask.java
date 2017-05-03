@@ -41,7 +41,7 @@ import java.util.List;
  */
 
 public class IconsTask {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private static final String TAG = IconsTask.class.getSimpleName();
 
     private static final String INTENT_FILTER_ICON_PACKS = "org.adw.launcher.THEMES";
@@ -89,7 +89,10 @@ public class IconsTask {
                             String attr = resourceParser.getAttributeName(i);
                             String value = resourceParser.getAttributeValue(i);
 
-                            if (attr.equals("component") &&
+                            if (attr.equals("component") && filter == null) {
+                                validApp = true; // If not an app, choose ANY icon
+                            }
+                            else if (attr.equals("component") &&
                                     value.substring(14, value.length() - 1).equals(filter.flattenToString())) {
                                 validApp = true;
                             } else if (attr.equals("drawable")) {
