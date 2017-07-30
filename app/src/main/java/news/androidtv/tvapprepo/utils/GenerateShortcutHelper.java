@@ -1,22 +1,14 @@
 package news.androidtv.tvapprepo.utils;
 
 import android.app.Activity;
-import android.app.Dialog;
-import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.app.AlertDialog;
-import android.text.Layout;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.Switch;
 import android.widget.Toast;
 
 import com.android.volley.NetworkResponse;
@@ -35,8 +27,6 @@ import org.json.JSONObject;
 import news.androidtv.tvapprepo.R;
 import news.androidtv.tvapprepo.activities.AdvancedShortcutActivity;
 import news.androidtv.tvapprepo.download.ApkDownloadHelper;
-import news.androidtv.tvapprepo.iconography.IconsTask;
-import news.androidtv.tvapprepo.iconography.PackedIcon;
 import news.androidtv.tvapprepo.model.AdvancedOptions;
 
 /**

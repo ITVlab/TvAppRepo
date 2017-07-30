@@ -86,7 +86,7 @@ public class AdvancedShortcutActivity extends Activity {
         }
 
         if (advancedOptions == null) {
-            advancedOptions = new AdvancedOptions(this);
+            advancedOptions = new AdvancedOptions(getApplicationContext());
         }
 
         loadCustomIconography();
