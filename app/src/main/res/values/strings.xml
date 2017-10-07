@@ -77,5 +77,7 @@
     <string name="advanced_options">Advanced Options</string>
     <string name="msg_pls_wait">Please wait. This may take up to 20 seconds.</string>
     <string name="generate_file_shortcut">File Link</string>
+    <string name="error_getting_logo" translatable="false">Error - Volley cannot get file data for app icon</string>
+    <string name="warning_no_banners_available" translatable="false">Cannot find custom banner packs for non-apps</string>
 
 </resources>

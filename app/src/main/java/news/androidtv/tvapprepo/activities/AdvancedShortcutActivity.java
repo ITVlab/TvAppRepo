@@ -109,6 +109,7 @@ public class AdvancedShortcutActivity extends Activity {
     }
 
     private void publish() {
+        advancedOptions.updateContext(this); // We pass in a new context for this activity.
         boolean isGame = ((Switch) findViewById(R.id.switch_isgame)).isChecked();
         String bannerUrl =
                 ((EditText) findViewById(R.id.edit_banner)).getText().toString();
@@ -116,6 +117,7 @@ public class AdvancedShortcutActivity extends Activity {
             advancedOptions.setBannerUrl(bannerUrl);
         }
         advancedOptions.setIsGame(isGame);
+        Log.d(TAG, "Sending form data to GenerateShortcutHelper");
         GenerateShortcutHelper.generateShortcut(this, resolveInfo, advancedOptions);
     }
 
@@ -126,7 +128,7 @@ public class AdvancedShortcutActivity extends Activity {
                             resolveInfo.activityInfo.name), callback);
 
         } else {
-            Toast.makeText(this, "Cannot set banner of non-app yet", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.warning_no_banners_available, Toast.LENGTH_SHORT).show();
         }
     }
 }

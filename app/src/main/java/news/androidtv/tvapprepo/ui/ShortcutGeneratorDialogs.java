@@ -37,11 +37,16 @@ public class ShortcutGeneratorDialogs {
                         }
                         String label = tag.replaceAll("(http://)|(https://)", "");
                         Log.d(TAG, IntentUriGenerator.generateWebBookmark(tag));
-                        AdvancedOptions options = new AdvancedOptions(activity)
-                                .setIntentUri(IntentUriGenerator.generateWebBookmark(tag))
-                                .setIconUrl("https://raw.githubusercontent.com/ITVlab/TvAppRepo/master/promo/graphics/icon.png") // TODO Replace icon url
-                                .setCustomLabel(label);
-                        GenerateShortcutHelper.begin(activity, label, options);
+                        try {
+                            AdvancedOptions options = new AdvancedOptions(activity)
+                                    .setIntentUri(IntentUriGenerator.generateWebBookmark(tag))
+                                    .setIconUrl("https://raw.githubusercontent.com/ITVlab/TvAppRepo/master/promo/graphics/icon.png") // TODO Replace icon url
+                                    .setCustomLabel(label);
+                            GenerateShortcutHelper.begin(activity, label, options);
+                        } catch (AdvancedOptions.StringLengthException exception) {
+                            Toast.makeText(activity, exception.getMessage(), Toast.LENGTH_SHORT)
+                                    .show();
+                        }
                     }
                 })
                 .positiveText(R.string.generate_shortcut)

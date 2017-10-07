@@ -285,11 +285,12 @@ public class PackageInstaller {
                         (DownloadManager) mActivity.getSystemService(Context.DOWNLOAD_SERVICE);
                 manager.enqueue(request);
             } catch (Exception e) {
-                Toast.makeText(mActivity.getApplicationContext(), e.getMessage(),
+                String errorMsg = e.getMessage() + ": " + downloadedFileName + ", " +
+                        urls[0] + ", " + DOWNLOADS_DIRECTORY.toString();
+                Toast.makeText(mActivity.getApplicationContext(), errorMsg,
                         Toast.LENGTH_SHORT).show();
                 // Tell user about an error and throw with additional debug info.
-                throw new RuntimeException(e.getMessage() + ": " + downloadedFileName + ", " +
-                        urls[0] + ", " + DOWNLOADS_DIRECTORY.toString());
+                throw new RuntimeException(errorMsg);
             }
             Log.i(TAG, "Download request for " + urls[0] + " enqueued");
             Log.d(TAG, "Should be saved to " + downloadedFileName);
