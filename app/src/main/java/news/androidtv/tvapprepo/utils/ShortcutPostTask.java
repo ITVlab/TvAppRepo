@@ -2,29 +2,21 @@ package news.androidtv.tvapprepo.utils;
 
 import android.content.Context;
 import android.content.pm.ResolveInfo;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Network;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
-import com.bumptech.glide.Glide;
 import com.sketchproject.infogue.modules.VolleyMultipartRequest;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import news.androidtv.tvapprepo.R;
 import news.androidtv.tvapprepo.model.AdvancedOptions;
@@ -123,16 +115,21 @@ public class ShortcutPostTask {
                 // file name could found file base or direct access from real path
                 // for now just get bitmap data from ImageView
                 if (options.getIcon() != null) {
-                    params.put(FORM_APP_LOGO, new DataPart("file_avatar.png", options.getIcon(),
+                    params.put(FORM_APP_LOGO, new DataPart("file_logo.png", options.getIcon(),
                             "image/png"));
                 } else if (app != null) {
-                    params.put(FORM_APP_LOGO, new DataPart("file_avatar.png",
-                            VolleyMultipartRequest.getFileDataFromDrawable(context,
-                                    app.activityInfo.loadIcon(context.getPackageManager())),
-                            "image/png"));
+                    try {
+                        byte[] imageData = VolleyMultipartRequest.getFileDataFromDrawable(context,
+                                app.activityInfo.loadIcon(context.getPackageManager()));
+                        params.put(FORM_APP_LOGO, new DataPart("file_logo.png", imageData,
+                                "image/png"));
+                    } catch (ClassCastException e) {
+                        Toast.makeText(context, R.string.error_getting_logo,
+                                Toast.LENGTH_SHORT).show();
+                    }
                 }
                 if (options.getBanner() != null) {
-                    params.put(FORM_APP_BANNER, new DataPart("file_avatar.png", options.getBanner(),
+                    params.put(FORM_APP_BANNER, new DataPart("file_banner.png", options.getBanner(),
                             "image/png"));
                 }
                 return params;
