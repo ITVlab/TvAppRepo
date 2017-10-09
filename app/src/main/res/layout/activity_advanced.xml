@@ -25,11 +25,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"></LinearLayout>
     </ScrollView>
+
     <EditText
-        android:layout_width="match_parent"
-        android:hint="Banner URL (Optional)"
         android:id="@+id/edit_banner"
-        android:layout_height="wrap_content" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Banner URL (Optional)"
+        android:inputType="textUri|textWebEditText" />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_marginTop="16dp"

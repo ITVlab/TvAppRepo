@@ -138,6 +138,7 @@ public class GenerateShortcutHelper {
             new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    Log.d(TAG, "Delaying until web ops are complete");
                     generateShortcut(activity, resolveInfo, options);
                 }
             }, 200);

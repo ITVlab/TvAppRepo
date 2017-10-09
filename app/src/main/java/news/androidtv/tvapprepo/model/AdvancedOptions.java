@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.bumptech.glide.Glide;
 
@@ -22,6 +23,8 @@ import news.androidtv.tvapprepo.utils.ShortcutPostTask;
  * Created by Nick on 3/20/2017. A model for storing advanced options in generating shortcuts.
  */
 public class AdvancedOptions implements Parcelable {
+    private static final String TAG = AdvancedOptions.class.getSimpleName();
+
     private volatile int mReady = 0;
     private String mCategory = "";
     private String mIconUrl = "";
@@ -115,6 +118,11 @@ public class AdvancedOptions implements Parcelable {
         return this;
     }
 
+    public void updateContext(Context context) {
+        // Swap out contexts.
+        this.mContext = context;
+    }
+
     public boolean isReady() {
         return mReady == 0;
     }
@@ -156,6 +164,9 @@ public class AdvancedOptions implements Parcelable {
             @Override
             public void run() {
                 try {
+                    if (context == null) {
+                        throw new NullPointerException("Context is null");
+                    }
                     Bitmap bitmap = Glide.with(context).load(url).asBitmap().into(320, 180).get();
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
