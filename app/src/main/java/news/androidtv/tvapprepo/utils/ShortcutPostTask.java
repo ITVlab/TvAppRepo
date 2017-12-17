@@ -45,6 +45,8 @@ import news.androidtv.tvapprepo.model.AdvancedOptions;
 public class ShortcutPostTask {
     private static final String TAG = ShortcutPostTask.class.getSimpleName();
 
+    private static final int TIMEOUT = 90 * 1000; // 90 seconds
+
     private static final String SUBMISSION_URL =
             "http://atvlauncher.trekgonewild.de/index_tvapprepo.php";
     private static final String FORM_APP_NAME = "app_name";
@@ -142,7 +144,7 @@ public class ShortcutPostTask {
         } catch (AuthFailureError authFailureError) {
             authFailureError.printStackTrace();
         }
-        sr.setRetryPolicy(new DefaultRetryPolicy(60 * 1000, 1, 0));
+        sr.setRetryPolicy(new DefaultRetryPolicy(TIMEOUT, 1, 0));
         queue.add(sr);
     }
 
