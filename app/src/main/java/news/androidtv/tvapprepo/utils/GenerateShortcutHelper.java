@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.VisibleForTesting;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
@@ -133,13 +134,19 @@ public class GenerateShortcutHelper {
 
     public static void generateShortcut(final Activity activity, final ResolveInfo resolveInfo,
             final AdvancedOptions options) {
+        generateShortcut(activity, resolveInfo, options, null);
+    }
+
+    @VisibleForTesting
+    public static void generateShortcut(final Activity activity, final ResolveInfo resolveInfo,
+                                        final AdvancedOptions options, final Callback callback) {
         if (!options.isReady()) {
             // Delay until we complete all web operations
             new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     Log.d(TAG, "Delaying until web ops are complete");
-                    generateShortcut(activity, resolveInfo, options);
+                    generateShortcut(activity, resolveInfo, options, callback);
                 }
             }, 200);
             return;
@@ -157,7 +164,11 @@ public class GenerateShortcutHelper {
                 new ShortcutPostTask.Callback() {
                     @Override
                     public void onResponse(NetworkResponse response) {
-                        downloadShortcutApk(activity, response, resolveInfo);
+                        if (callback != null) {
+                            callback.onResponseComplete(new String(response.data));
+                        } else {
+                            downloadShortcutApk(activity, response, resolveInfo);
+                        }
                     }
 
                     @Override
@@ -165,6 +176,12 @@ public class GenerateShortcutHelper {
                         Toast.makeText(activity,
                                 activity.getString(R.string.err_build_failed_reason, error.getMessage()),
                                 Toast.LENGTH_SHORT).show();
+                        Toast.makeText(activity,
+                                new String(error.networkResponse.data),
+                                Toast.LENGTH_LONG).show();
+                        if (callback != null) {
+                            callback.onResponseFailed(error);
+                        }
                     }
                 });
     }
@@ -236,5 +253,11 @@ public class GenerateShortcutHelper {
             }
         });
         ad.loadAd(activity.getString(R.string.reward_video_ad_unit_id), new AdRequest.Builder().build());
+    }
+
+    @VisibleForTesting
+    public interface Callback {
+        void onResponseComplete(String response);
+        void onResponseFailed(VolleyError error);
     }
 }

@@ -145,6 +145,7 @@ public class MainFragment extends BrowseFragment {
             mBackgroundTimer.cancel();
         }
         mApkDownloadHelper.removeListener(mDownloadListener);
+        mApkDownloadHelper.destroy();
     }
 
     @Override
