@@ -251,6 +251,11 @@ public class GenerateShortcutHelper {
             public void onRewardedVideoAdFailedToLoad(int i) {
 
             }
+
+            @Override
+            public void onRewardedVideoCompleted() {
+                
+            }
         });
         ad.loadAd(activity.getString(R.string.reward_video_ad_unit_id), new AdRequest.Builder().build());
     }
