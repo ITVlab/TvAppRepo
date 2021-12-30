@@ -1,6 +1,6 @@
 package news.androidtv.tvapprepo.model;
 
-import android.support.annotation.Keep;
+import androidx.annotation.Keep;
 
 /**
  * Represents a shortcut application which simply redirects the user to the intended activity

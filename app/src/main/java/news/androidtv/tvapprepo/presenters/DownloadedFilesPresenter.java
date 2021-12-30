@@ -1,7 +1,7 @@
 package news.androidtv.tvapprepo.presenters;
 
-import android.support.v17.leanback.widget.ImageCardView;
-import android.support.v17.leanback.widget.Presenter;
+import androidx.leanback.widget.ImageCardView;
+import androidx.leanback.widget.Presenter;
 import android.view.ContextThemeWrapper;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import java.io.File;
 
 import news.androidtv.tvapprepo.R;
-import news.androidtv.tvapprepo.model.SettingOption;
 
 /**
  * A presenter which can be used to show downloaded APKs with an optional title along the bottom.

@@ -26,7 +26,8 @@
             android:name=".activities.MainActivity"
             android:label="@string/app_name"
             android:logo="@drawable/banner"
-            android:screenOrientation="landscape">
+            android:screenOrientation="landscape"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
@@ -38,7 +39,7 @@
         <activity android:name=".activities.BrowseErrorActivity" />
 
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
             android:exported="false"
             android:grantUriPermissions="true">
@@ -67,6 +68,10 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="dfe843f8af6acfe924ff6efa0c816fda4ece9f5c" />
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-1944443832257008~2295844375"/>
 
     </application>
 

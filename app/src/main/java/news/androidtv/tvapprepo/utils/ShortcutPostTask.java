@@ -2,6 +2,9 @@ package news.androidtv.tvapprepo.utils;
 
 import android.content.Context;
 import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.widget.Toast;
 

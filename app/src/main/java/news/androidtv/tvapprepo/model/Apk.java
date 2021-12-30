@@ -1,6 +1,6 @@
 package news.androidtv.tvapprepo.model;
 
-import android.support.annotation.Keep;
+import androidx.annotation.Keep;
 import android.util.Log;
 
 import org.json.JSONException;

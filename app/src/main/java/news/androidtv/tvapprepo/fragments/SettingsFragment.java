@@ -2,14 +2,14 @@ package news.androidtv.tvapprepo.fragments;
 
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v14.preference.PreferenceFragment;
-import android.support.v17.preference.LeanbackPreferenceFragment;
-import android.support.v17.preference.LeanbackSettingsFragment;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.preference.DialogPreference;
-import android.support.v7.preference.Preference;
-import android.support.v7.preference.PreferenceScreen;
-import android.support.v7.view.ContextThemeWrapper;
+import androidx.preference.PreferenceFragment;
+import androidx.leanback.preference.LeanbackPreferenceFragment;
+import androidx.leanback.preference.LeanbackSettingsFragment;
+import androidx.appcompat.app.AlertDialog;
+import androidx.preference.DialogPreference;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceScreen;
+import androidx.appcompat.view.ContextThemeWrapper;
 import android.util.Log;
 import android.widget.Toast;
 

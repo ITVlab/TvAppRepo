@@ -6,8 +6,8 @@ import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.VisibleForTesting;
-import android.support.v7.app.AlertDialog;
+import androidx.annotation.VisibleForTesting;
+import androidx.appcompat.app.AlertDialog;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.widget.Toast;
@@ -250,6 +250,11 @@ public class GenerateShortcutHelper {
             @Override
             public void onRewardedVideoAdFailedToLoad(int i) {
 
+            }
+
+            @Override
+            public void onRewardedVideoCompleted() {
+                
             }
         });
         ad.loadAd(activity.getString(R.string.reward_video_ad_unit_id), new AdRequest.Builder().build());

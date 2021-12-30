@@ -1,17 +1,14 @@
 package news.androidtv.tvapprepo.presenters;
 
 import android.content.pm.ResolveInfo;
-import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.support.v17.leanback.widget.ImageCardView;
-import android.support.v17.leanback.widget.Presenter;
-import android.support.v7.graphics.Palette;
+import androidx.leanback.widget.ImageCardView;
+import androidx.leanback.widget.Presenter;
+import androidx.palette.graphics.Palette;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-
-import java.io.File;
 
 import news.androidtv.tvapprepo.R;
 
