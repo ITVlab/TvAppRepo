@@ -50,7 +50,6 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import io.fabric.sdk.android.Fabric;
 import news.androidtv.tvapprepo.R;
 import news.androidtv.tvapprepo.Utils;
 import news.androidtv.tvapprepo.activities.DetailsActivity;
