@@ -15,9 +15,8 @@
 package news.androidtv.tvapprepo.presenters;
 
 import android.content.Context;
-import android.support.v17.leanback.widget.AbstractDetailsDescriptionPresenter;
+import androidx.leanback.widget.AbstractDetailsDescriptionPresenter;
 import android.util.Log;
-import android.widget.TextView;
 
 import com.google.firebase.database.DatabaseError;
 

@@ -22,7 +22,7 @@ import news.androidtv.tvapprepo.R;
 /*
  * This class demonstrates how to extend ErrorFragment
  */
-public class ErrorFragment extends android.support.v17.leanback.app.ErrorFragment {
+public class ErrorFragment extends androidx.leanback.app.ErrorFragment {
     private static final String TAG = "ErrorFragment";
     private static final boolean TRANSLUCENT = true;
 
