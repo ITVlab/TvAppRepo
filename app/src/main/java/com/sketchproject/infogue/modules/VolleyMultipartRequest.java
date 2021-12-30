@@ -2,6 +2,7 @@ package com.sketchproject.infogue.modules;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
@@ -342,9 +343,17 @@ public class VolleyMultipartRequest extends Request<NetworkResponse> {
      * @return byte array
      */
     public static byte[] getFileDataFromDrawable(Context context, Drawable drawable) {
-        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+        Bitmap bitmap = getBitmapFromDrawable(drawable);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
         return byteArrayOutputStream.toByteArray();
+    }
+
+    private static Bitmap getBitmapFromDrawable(Drawable drawable) {
+        final Bitmap bmp = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        final Canvas canvas = new Canvas(bmp);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+        return bmp;
     }
 }
